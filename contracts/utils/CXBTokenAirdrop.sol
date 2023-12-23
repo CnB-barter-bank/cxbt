@@ -5,15 +5,15 @@ import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 import "@openzeppelin/contracts/access/manager/AccessManaged.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/Pausable.sol";
-import "../tokens/CnBCoinToken.sol";
-import "./CnBCoinVesting.sol";
+import "../tokens/CXBToken.sol";
+import "./CXBTokenVesting.sol";
 
-contract CnBCoinAirdrop is AccessManaged, ReentrancyGuard, Pausable {
+contract CXBTokenAirdrop is AccessManaged, ReentrancyGuard, Pausable {
     /**
      * @dev Indicates an error related to the already redeemed amount. Used in redeem.
      * @param target Address who calls redeem..
      */
-    error CnBCoinAirdropAlreadyRedeemed(address target);
+    error CXBTokenAirdropAlreadyRedeemed(address target);
 
     /**
      * @dev Indicates an error related to the wrong tree validation. Used in redeem.
@@ -21,7 +21,7 @@ contract CnBCoinAirdrop is AccessManaged, ReentrancyGuard, Pausable {
      * @param amount Amount redeemed.
      * @param proof The proof provided.
      */
-    error CnBCoinAirdropWrongPath(
+    error CXBTokenAirdropWrongPath(
         address target,
         uint256 amount,
         bytes32[] proof
@@ -30,26 +30,26 @@ contract CnBCoinAirdrop is AccessManaged, ReentrancyGuard, Pausable {
     /**
      * @dev Indicates an error when empty token is provided.
      */
-    error CnBCoinAirdropEmptyToken();
+    error CXBTokenAirdropEmptyToken();
 
     event Redeem(address indexed account, uint256 amount);
     event Vesting(address indexed account, uint256 amount);
 
     bytes32 public root;
-    CnBCoinToken private token;
-    CnBCoinVesting private vesting;
+    CXBToken private token;
+    CXBTokenVesting private vesting;
     uint256 public redeemAmount;
     mapping(address => bool) private redeemed;
 
     constructor(
-        CnBCoinToken _token,
-        CnBCoinVesting _vesting,
+        CXBToken _token,
+        CXBTokenVesting _vesting,
         address initialAuthority,
         uint256 _amount,
         bytes32 _root
     ) AccessManaged(initialAuthority) {
         if (address(_token) == address(0)) {
-            revert CnBCoinAirdropEmptyToken();
+            revert CXBTokenAirdropEmptyToken();
         }
         root = _root;
         token = _token;
@@ -61,13 +61,13 @@ contract CnBCoinAirdrop is AccessManaged, ReentrancyGuard, Pausable {
     /// @param proof Proof path.
     function redeem(bytes32[] memory proof) public nonReentrant whenNotPaused {
         if (redeemed[msg.sender]) {
-            revert CnBCoinAirdropAlreadyRedeemed(msg.sender);
+            revert CXBTokenAirdropAlreadyRedeemed(msg.sender);
         }
         bytes32 leaf = keccak256(
             bytes.concat(keccak256(abi.encode(msg.sender, redeemAmount)))
         );
         if (!MerkleProof.verify(proof, root, leaf)) {
-            revert CnBCoinAirdropWrongPath(msg.sender, redeemAmount, proof);
+            revert CXBTokenAirdropWrongPath(msg.sender, redeemAmount, proof);
         }
         redeemed[msg.sender] = true;
         if (address(vesting) == address(0)) {
@@ -88,16 +88,16 @@ contract CnBCoinAirdrop is AccessManaged, ReentrancyGuard, Pausable {
 
     /// @notice Update token address
     /// @param _token New token address.
-    function updateToken(CnBCoinToken _token) public restricted whenPaused{
+    function updateToken(CXBToken _token) public restricted whenPaused{
         if (address(_token) == address(0)) {
-            revert CnBCoinAirdropEmptyToken();
+            revert CXBTokenAirdropEmptyToken();
         }
         token = _token;
     }
 
     /// @notice Update vesting address
     /// @param _vesting New vesting address.
-    function updateVesting(CnBCoinVesting _vesting) public restricted whenPaused{
+    function updateVesting(CXBTokenVesting _vesting) public restricted whenPaused{
         vesting = _vesting;
     }
 
