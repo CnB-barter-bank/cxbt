@@ -43,10 +43,6 @@ Payment tokens
 |USDT   |0.909 |TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t        |
 |USDC   |0.909 |TEkxiTehnzSmSe2XqrBj4w32RUN966rdz8        |
 |TUSD   |0.909 |TUpMhErZL2fhh4sVNULAbNKLokS4GjC1F4        |
-|Polygon zKVM                                             |
-|USDT   |0.909 |0x1e4a5963abfd975d8c9021ce480b42188849d41d|
-|USDC   |0.909 |0xa8ce8aee21bc2a48a5ef670afcc9274c7bbbc035|
-|DAI    |0.909 |0xc5015b9d9161dca7e18e32f6f25c4ad850731fd4|
 
 ```shell
 npx hardhat help
