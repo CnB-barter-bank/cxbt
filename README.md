@@ -2,6 +2,7 @@
 
 Payment tokens
 |Token  |Rate  |Address                                   |
+ ------ | ---- | ---------------------------------------- |
 |Ethereum                                                 |
 |EURS   |1     |0xdb25f211ab05b1c97d595516f45794528a807ad8|
 |EURT   |1     |0xc581b735a1688071a1746c968e0798d642ede491|
