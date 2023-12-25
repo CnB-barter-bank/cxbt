@@ -1,7 +1,7 @@
 import { createApp } from 'vue'
 import { IonicVue } from '@ionic/vue'
 import { createPinia } from 'pinia'
-
+import {Chains, createWeb3Auth} from '@kolirt/vue-web3-auth'
 import App from './App.vue'
 import router from './router'
 
@@ -26,7 +26,16 @@ import './theme/variables.css'
 
 const pinia = createPinia()
 const app = createApp(App).use(IonicVue).use(router).use(pinia)
-
+ .use(createWeb3Auth({
+  projectId: '899c95d8d634fcecf3b9f7859173a69c',
+  chains: [
+      Chains.bsc,
+      Chains.mainnet,
+      Chains.polygon,
+      Chains.avalanche,
+      Chains.baseSepolia
+  ]
+}))
 router.isReady().then(() => {
   app.mount('#app')
 })

@@ -27,7 +27,7 @@
           ><ion-icon slot="icon-only" :icon="addOutline"></ion-icon
         ></ion-button>
       </div>
-      <ion-button router-link="/about">About</ion-button>
+      <ion-button @click="connect">Connect</ion-button>
     </ion-content>
   </ion-page>
 </template>
@@ -48,6 +48,10 @@ import { useMainStore } from '../stores/main.store'
 import { removeOutline, addOutline } from 'ionicons/icons'
 
 const mainStore = useMainStore()
+
+const connect = () => {
+  
+}
 </script>
 
 <style>

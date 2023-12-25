@@ -30,6 +30,7 @@ contract PresaleManager is Ownable, AccessManager, Pausable {
     error CannotTransfer(address currency);
     error NotOwned(address target);
     error EmptyNewToken();
+    error IncorrectPosition();
 
     event BoughtTokens(
         address indexed sender,
@@ -105,6 +106,15 @@ contract PresaleManager is Ownable, AccessManager, Pausable {
         return currencies.get(currency);
     }
 
+    function at(uint256 ratePos) public view returns (address, uint256) {
+        if (ratePos >= currencies.length()) revert IncorrectPosition();
+        return currencies.at(ratePos);
+    }
+
+    function length() public view returns (uint256) {
+        return currencies.length();
+    }
+
     function hasRate(
         address currency
     ) public view whenNotPaused returns (bool) {
@@ -143,7 +153,7 @@ contract PresaleManager is Ownable, AccessManager, Pausable {
         return (rate * value * bonusPercent) / (10 ** decimals);
     }
 
-    function buy(address currency, uint256 value) public returns (bool) {
+    function buy(address currency, uint256 value) public whenNotPaused returns (bool) {
         uint256 amount = getResultAmount(currency, value);
         if (!IERC20(currency).transferFrom(msg.sender, address(this), value))
             return false;

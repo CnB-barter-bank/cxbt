@@ -34,20 +34,22 @@ Payment tokens
 |USDC   |0.909 |0xb97ef9ef8734c71904d8002f8b6bc66dd9c48a6e|
 |DAI    |0.909 |0xd586e7f844cea2f87f50152665bcbc2c279d8d70|
 |TUSD   |0.909 |0x1c20e891bab6b1727d14da358fae2984ed9b59eb|
-|Gnosis                                                   |
-|AGEUR  |1     |0x4b1e2c2762667331bc91648052f646d1b0d35984|
-|USDT   |0.909 |0x4ecaba5870353805a9f068101a40e0f32ed605c6|
-|USDC   |0.909 |0xddafbb505ad214d7b80b1f830fccc89b60fb7a83|
-|DAI    |0.909 |0x44fa8e6f47987339850636f88629646662444217|
-|Tron                                                     |  
+|Tron ???? [TODO]                                         |  
 |USDT   |0.909 |TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t        |
 |USDC   |0.909 |TEkxiTehnzSmSe2XqrBj4w32RUN966rdz8        |
 |TUSD   |0.909 |TUpMhErZL2fhh4sVNULAbNKLokS4GjC1F4        |
 
 ```shell
+npx hardhat vars setup
+npx hardhat vars set ETHERSCAN_API_KEY 
+npx hardhat vars set INFURA_API_KEY
+npx hardhat vars set MNEMONIC
+npx hardhat vars set BSCSCAN_API_KEY
 npx hardhat help
 npx hardhat test
 REPORT_GAS=true npx hardhat test
 npx hardhat node
 npx hardhat run scripts/deploy.ts
 ```
+
+You need to deploy token first, deploy manager with token's address, and change authority of token to the manager's address

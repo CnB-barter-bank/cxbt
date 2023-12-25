@@ -8,7 +8,7 @@ import "@openzeppelin/contracts/access/manager/AccessManaged.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol";
 import "./Freezable.sol";
 
-contract CXBToken is 
+contract CXBToken is
     ERC20,
     ERC20Burnable,
     ERC20Pausable,
@@ -52,13 +52,7 @@ contract CXBToken is
     function mint(
         address to,
         uint256 amount
-    )
-        public
-        restricted
-        whenNotPaused
-        whenNotFreezed(to)
-        whenNotFreezed(msg.sender)
-    {
+    ) public restricted whenNotFreezed(to) {
         _mint(to, amount);
     }
 
@@ -85,6 +79,7 @@ contract CXBToken is
         public
         virtual
         override
+        whenNotPaused
         whenNotFreezed(to)
         whenNotFreezed(msg.sender)
         returns (bool)
@@ -102,6 +97,7 @@ contract CXBToken is
         public
         virtual
         override
+        whenNotPaused
         whenNotFreezed(to)
         whenNotFreezed(from)
         returns (bool)
