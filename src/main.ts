@@ -23,17 +23,21 @@ import '@ionic/vue/css/display.css'
 
 /* Theme variables */
 import './theme/variables.css'
+import { sepolia } from './utils/blockchain'
 
 const pinia = createPinia()
-const app = createApp(App).use(IonicVue).use(router).use(pinia)
+const app = createApp(App).use(IonicVue, {
+  mode: 'ios',
+}).use(router).use(pinia)
  .use(createWeb3Auth({
   projectId: '899c95d8d634fcecf3b9f7859173a69c',
   chains: [
-      Chains.bsc,
+      // Chains.bsc,
       Chains.mainnet,
       Chains.polygon,
       Chains.avalanche,
-      Chains.baseSepolia
+      sepolia
+      // Chains.baseSepolia
   ]
 }))
 router.isReady().then(() => {
