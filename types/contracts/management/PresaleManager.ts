@@ -28,6 +28,8 @@ export interface PresaleManagerInterface extends Interface {
     nameOrSignature:
       | "ADMIN_ROLE"
       | "PUBLIC_ROLE"
+      | "SALT"
+      | "at"
       | "balanceOf"
       | "buy"
       | "canCall"
@@ -56,6 +58,7 @@ export interface PresaleManagerInterface extends Interface {
       | "hashOperation"
       | "isTargetClosed"
       | "labelRole"
+      | "length"
       | "minSetback"
       | "multicall"
       | "owner"
@@ -108,6 +111,8 @@ export interface PresaleManagerInterface extends Interface {
     functionFragment: "PUBLIC_ROLE",
     values?: undefined
   ): string;
+  encodeFunctionData(functionFragment: "SALT", values?: undefined): string;
+  encodeFunctionData(functionFragment: "at", values: [BigNumberish]): string;
   encodeFunctionData(
     functionFragment: "balanceOf",
     values: [AddressLike]
@@ -208,6 +213,7 @@ export interface PresaleManagerInterface extends Interface {
     functionFragment: "labelRole",
     values: [BigNumberish, string]
   ): string;
+  encodeFunctionData(functionFragment: "length", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "minSetback",
     values?: undefined
@@ -290,6 +296,8 @@ export interface PresaleManagerInterface extends Interface {
     functionFragment: "PUBLIC_ROLE",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "SALT", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "at", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "buy", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "canCall", data: BytesLike): Result;
@@ -351,6 +359,7 @@ export interface PresaleManagerInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "labelRole", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "length", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "minSetback", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "multicall", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
@@ -718,6 +727,10 @@ export interface PresaleManager extends BaseContract {
 
   PUBLIC_ROLE: TypedContractMethod<[], [bigint], "view">;
 
+  SALT: TypedContractMethod<[], [bigint], "view">;
+
+  at: TypedContractMethod<[ratePos: BigNumberish], [[string, bigint]], "view">;
+
   balanceOf: TypedContractMethod<[currency: AddressLike], [bigint], "view">;
 
   buy: TypedContractMethod<
@@ -845,6 +858,8 @@ export interface PresaleManager extends BaseContract {
     "nonpayable"
   >;
 
+  length: TypedContractMethod<[], [bigint], "view">;
+
   minSetback: TypedContractMethod<[], [bigint], "view">;
 
   multicall: TypedContractMethod<[data: BytesLike[]], [string[]], "nonpayable">;
@@ -951,6 +966,12 @@ export interface PresaleManager extends BaseContract {
   getFunction(
     nameOrSignature: "PUBLIC_ROLE"
   ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "SALT"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "at"
+  ): TypedContractMethod<[ratePos: BigNumberish], [[string, bigint]], "view">;
   getFunction(
     nameOrSignature: "balanceOf"
   ): TypedContractMethod<[currency: AddressLike], [bigint], "view">;
@@ -1094,6 +1115,9 @@ export interface PresaleManager extends BaseContract {
     [void],
     "nonpayable"
   >;
+  getFunction(
+    nameOrSignature: "length"
+  ): TypedContractMethod<[], [bigint], "view">;
   getFunction(
     nameOrSignature: "minSetback"
   ): TypedContractMethod<[], [bigint], "view">;

@@ -10,8 +10,7 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "lib": ["esnext", "dom"],
-    "skipLibCheck": true,
-    "resolveJsonModule": true
+    "skipLibCheck": true, 
   },
   "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"]
 }

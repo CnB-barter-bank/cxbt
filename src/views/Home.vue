@@ -1,7 +1,7 @@
 <template>
   <ion-page>
     <ion-header>
-      <ion-toolbar 
+      <ion-toolbar
         ><ion-title>
           <ion-grid>
             <ion-row class="ion-justify-content-between ion-align-items-center">
@@ -22,8 +22,12 @@
     <ion-content class="ion-padding">
       <ion-grid>
         <ion-row class="ion-justify-content-center">
-          <ion-col size="6">
-            <ion-card v-if="account.connected" style="min-height: 300px">
+          <ion-col size="auto">
+            <ion-card
+              v-if="account.connected"
+              style="min-height: 300px"
+              class="sizeMd"
+            >
               <ion-card-header>
                 <ion-card-title>Buy CXBT tokens</ion-card-title>
               </ion-card-header>
@@ -44,7 +48,7 @@
                         Your current balance is
                       </h1>
                       <p style="font-size: 48pt; text-align: center">
-                        {{ coinAmount }} CXBT
+                        {{ formatValue(coinAmount) }} CXBT
                       </p>
                     </ion-col>
                   </ion-row>
@@ -82,23 +86,84 @@
                       </ion-select></ion-col
                     >
                   </ion-row>
-                  <ion-row  class="ion-align-items-center"
-                    ><ion-col size="6">
+                  <ion-row class="ion-align-items-center"
+                    ><ion-col size="12">
                       <ion-input
-                        label-placement="stacked"
-                        v-model="buyTokens"
-                        style="border: 1px solid gray;border-radius: 4px; padding:0 8px !important"
+                        :disabled="!token.rate"
+                        :value="offeredTokens"
+                        @ionInput="buyTokens"
+                        style="
+                          border: 1px solid gray;
+                          border-radius: 4px;
+                          padding: 0 8px !important;
+                          flex-direction: row-reverse;
+                        "
                       >
+                        <ion-icon
+                          v-if="token.currency == 'usd'"
+                          slot="start"
+                          :icon="logoUsd"
+                          aria-hidden="true"
+                        ></ion-icon>
+                        <ion-icon
+                          v-if="token.currency == 'euro'"
+                          slot="start"
+                          :icon="logoEuro"
+                          aria-hidden="true"
+                        ></ion-icon>
+                        <ion-button
+                          @click="setMaxAmount"
+                          fill="clear"
+                          slot="end"
+                          aria-label="Max"
+                          >Max: {{ tokenAmount }}</ion-button
+                        >
                       </ion-input>
                     </ion-col>
-                    <ion-col size="6">
-                      <a @click="setMaxAmount">Max</a>:
-                      {{ tokenAmount }}
-                    </ion-col>
+                  </ion-row>
+                  <ion-row class="ion-justify-content-center">
+                    <ion-col size="1">
+                      <ion-icon
+                        :icon="arrowDownCircleOutline"
+                        style="width: 64px; height: 64px"
+                      ></ion-icon> </ion-col
+                  ></ion-row>
+                  <ion-row>
+                    <ion-col size="12">
+                      <ion-input
+                        :disabled="!token.rate"
+                        :value="gainedTokens"
+                        @ionInput="takeTokens"
+                        style="
+                          border: 1px solid gray;
+                          border-radius: 4px;
+                          padding: 0 8px !important;
+                        "
+                      >
+                      </ion-input
+                    ></ion-col>
+                  </ion-row>
+                  <ion-row>
+                    <ion-col size="12">
+                      <ion-label>Bonus tokens</ion-label>
+                      <ion-input
+                        :disabled="true"
+                        :value="bonusTokens"
+                        style="
+                          border: 1px solid gray;
+                          border-radius: 4px;
+                          padding: 0 8px !important;
+                        "
+                      >
+                      </ion-input
+                    ></ion-col>
                   </ion-row>
                   <ion-row>
                     <ion-col size="12"
-                      ><ion-button @click="purchcase" expand="block"
+                      ><ion-button
+                        @click="purchcase"
+                        expand="block"
+                        :disabled="purchcaseDisabled"
                         >Purchcase</ion-button
                       >
                     </ion-col>
@@ -144,6 +209,7 @@ import {
   IonSelect,
   IonSelectOption,
   IonInput,
+  IonLabel,
 } from '@ionic/vue'
 import { useMainStore } from '../stores/main.store'
 import {
@@ -159,24 +225,40 @@ import {
   switchChain,
   selectChain,
   fetchBalance,
+  multicall,
   Chain,
   useFetchBalance,
+  erc20ABI,
+  writeContract,
+  readContract,
 } from '@kolirt/vue-web3-auth'
-import { removeOutline, addOutline } from 'ionicons/icons'
+import {
+  arrowDownCircleOutline,
+  logoUsd,
+  logoEuro,
+  cashOutline,
+  mic,
+  mailUnread,
+} from 'ionicons/icons'
 import { onMounted, ref, watch } from 'vue'
-import { tokens as tokensByNetworks, EthAddressType } from '../utils/blockchain'
+import {
+  tokens as tokensByNetworks,
+  EthAddressType,
+  TokenDataType,
+} from '../utils/blockchain'
+import { abi as managerABI } from '../../artifacts/contracts/management/PresaleManager.sol/PresaleManager.json'
+import { abi as tokenABI } from '../../artifacts/contracts/tokens/CXBToken.sol/CXBToken.json'
+
 const chains = getAvailableChains()
 const mainStore = useMainStore()
 const switchingTo = {} as any
-const buyTokens = ref('0')
+const purchcaseDisabled = ref(true)
+const offeredTokens = ref('0')
+const gainedTokens = ref('0')
+const bonusTokens = ref('0')
 let coinToken: EthAddressType // = '0x701b22e638Ec0dF950601609B977637b15Ab01ac' // '0x26522BDb9a943D06D38574679bAe99ad30B6B1E0'
 
-type TokenRec = {
-  name: string
-  address: string
-}
-
-const token = ref({} as TokenRec)
+const token = ref({} as TokenDataType)
 
 const coinAmount = ref('')
 const tokenAmount = ref('')
@@ -202,13 +284,61 @@ const getMyBalance = async (token: EthAddressType) => {
   return out
 }
 
+const computeGained = () => {
+  if (token.value.rate == undefined) {
+    gainedTokens.value = '0'
+    bonusTokens.value = '0'
+    return
+  }
+  const val = Number(offeredTokens.value) * token.value.rate
+  gainedTokens.value = formatValue(val.toString())
+  bonusTokens.value = formatValue((val * 0.2).toString())
+}
+
+const buyTokens = (ev: any) => {
+  offeredTokens.value = formatValue(
+    ev.target!.value.replace(/[^0-9\.]+/g, ''),
+    false
+  )
+  purchcaseDisabled.value = !Number(offeredTokens.value)
+  computeGained()
+}
+
+const takeTokens = (ev: any) => {
+  gainedTokens.value = formatValue(
+    ev.target!.value.replace(/[^0-9\.]+/g, ''),
+    false
+  )
+  if (token.value.rate == undefined) {
+    gainedTokens.value = '0'
+    bonusTokens.value = '0'
+    return
+  }
+  bonusTokens.value = formatValue((Number(gainedTokens.value) * 0.2).toString())
+  offeredTokens.value = formatValue(
+    (Number(gainedTokens.value) / token.value.rate).toString()
+  )
+  purchcaseDisabled.value = !Number(offeredTokens.value)
+}
+
+const formatValue = (raw: string, trim = true) => {
+  let [m, l] = raw.split('.', 2)
+  while (m.length > 1 && m[0] == '0') m = m.substring(1)
+  if (!l) return m
+  if (trim) l = l.substring(0, 4);
+  while (l.length > 0 && l.substring(l.length - 1) == '0')
+    l = l.substring(0, l.length - 1)
+  return `${m}.${l}`
+}
+
 const populateBalances = async () => {
   coinToken = getCoin(chain.value.id)
   coinAmount.value = (await getMyBalance(coinToken)).formatted
   if (!!token.value.address) {
-    tokenAmount.value = (
-      await getMyBalance(token.value.address as any)
-    ).formatted
+    tokenAmount.value = formatValue(
+      (await getMyBalance(token.value.address as any)).formatted
+    )
+    computeGained()
   } else {
     tokenAmount.value = '0'
   }
@@ -216,7 +346,7 @@ const populateBalances = async () => {
 
 const refreshTokens = async () => {
   await populateBalances()
-  setTimeout(refreshTokens, 1000)
+  setTimeout(refreshTokens, 15000)
 }
 
 // Polygon 137
@@ -225,7 +355,7 @@ const refreshTokens = async () => {
 // Avalanche 43114
 // BSC  56
 
-const tokens = ref([] as TokenRec[])
+const tokens = ref([] as TokenDataType[])
 
 const getTokens = (chainId: number) => {
   const found = tokensByNetworks.find((item) => item.chainId == chainId)
@@ -239,32 +369,76 @@ const getCoin = (chainId: number): EthAddressType => {
   return found.coin! as EthAddressType
 }
 
+const getManager = (chainId: number): EthAddressType => {
+  const found = tokensByNetworks.find((item) => item.chainId == chainId)
+  if (!found) return '0x0'
+  return found.manager! as EthAddressType
+}
+
 const setMaxAmount = (ev: any) => {
-  buyTokens.value = tokenAmount.value
+  offeredTokens.value = tokenAmount.value
+  computeGained()
 }
 
 watch(chain, async (newChain) => {
   tokens.value = getTokens(newChain.id)
   coinToken = getCoin(newChain.id)
-  token.value = {} as TokenRec
+  token.value = {} as TokenDataType
 })
 
-const changeToken = async (newToken: TokenRec) => {
+const changeToken = async (newToken: TokenDataType) => {
   token.value = newToken
+  purchcaseDisabled.value = !Number(offeredTokens.value)
+  await populateBalances()
 }
 
 const changeNetwork = async (chainId: number) => {
   if (!switchingTo[chainId]) {
+    purchcaseDisabled.value = true
     switchingTo[chainId] = true
     const newChain = chains.find((item) => item.id == chainId)
     if (!newChain) throw new Error(`Cannot switch to unknown chain ${chainId}`)
     await switchChain(newChain).finally(async () => {
       switchingTo[chainId] = false
+      await populateBalances()
     })
   }
 }
 
-const purchcase = async () => {}
+const mul = (amount: string, decimals: number) => {
+  const [m, l] = amount.split('.', 2)
+  if (!l) return m + '0'.repeat(decimals)
+  return m + l + '0'.repeat(decimals - l.length)
+}
+
+const purchcase = async () => {
+  try {
+    purchcaseDisabled.value = true
+    const decimals = await readContract({
+      address: token.value.address as EthAddressType,
+      abi: erc20ABI,
+      functionName: 'decimals',
+      args: [],
+    })
+    const fractions = mul(offeredTokens.value, Number(decimals))
+    const tokenData = await writeContract({
+      abi: erc20ABI,
+      address: token.value.address as EthAddressType,
+      functionName: 'approve',
+      args: [getManager(chain.value.id), fractions],
+    })
+    await tokenData.wait()
+    const managerData = await writeContract({
+      abi: managerABI,
+      address: getManager(chain.value.id) as EthAddressType,
+      functionName: 'buy',
+      args: [token.value.address, fractions],
+    })
+    await managerData.wait()
+  } finally {
+    purchcaseDisabled.value = false
+  }
+}
 </script>
 
 <style>
@@ -272,16 +446,5 @@ const purchcase = async () => {}
   display: flex;
   justify-content: center;
   align-items: center;
-}
-ion-input.custom {
-  --padding-bottom: 10px;
-  --padding-end: 10px;
-  --padding-start: 10px;
-  --padding-top: 10px;
-  --border-radius: 2px;
-  --border-style: solid;
-  --border-color: grey;
-  --border-width: 1px;
-  --color: red;
 }
 </style>

@@ -3,7 +3,9 @@ import { HardhatUserConfig } from 'hardhat/config'
 import '@nomicfoundation/hardhat-toolbox-viem'
 // import '@nomiclabs/hardhat-waffle'
 import '@nomicfoundation/hardhat-toolbox'
-import 'hardhat-deploy'
+import "@nomicfoundation/hardhat-ethers";
+import "hardhat-deploy";
+import "hardhat-deploy-ethers"; 
 import { vars, task } from 'hardhat/config'
 import type { NetworkUserConfig } from 'hardhat/types'
 

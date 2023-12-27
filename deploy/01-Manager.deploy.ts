@@ -10,6 +10,8 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     from: useDeployer,
     args: [useDeployer, "0x701b22e638Ec0dF950601609B977637b15Ab01ac", 20],
     log: true,
+    skipIfAlreadyDeployed:false,
+    deterministicDeployment: true
   }) 
 
   console.log(`PresaleManager contract: `, manager.address)
