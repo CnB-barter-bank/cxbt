@@ -7,7 +7,7 @@ import {address as avalancheManager} from '../../deployments/avalanche/PresaleMa
 import {address as bscToken} from '../../deployments/bsc/CXBToken.json'
 import {address as bscManager} from '../../deployments/bsc/PresaleManager.json'
 import {address as mainnetToken} from '../../deployments/mainnet/CXBToken.json'
-import {address as mainnetManager} from '../../deployments/mainnet/PresaleManager.json'
+// import {address as mainnetManager} from '../../deployments/mainnet/PresaleManager.json'
 import {address as polygonMainnetToken} from '../../deployments/polygon-mainnet/CXBToken.json'
 import {address as polygonMainnetManager} from '../../deployments/polygon-mainnet/PresaleManager.json'
 
