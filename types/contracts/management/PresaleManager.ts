@@ -77,6 +77,7 @@ export interface PresaleManagerInterface extends Interface {
       | "setTargetAdminDelay"
       | "setTargetClosed"
       | "setTargetFunctionRole"
+      | "transferAuthority"
       | "transferOwnership"
       | "unfreeze"
       | "unpause"
@@ -278,6 +279,10 @@ export interface PresaleManagerInterface extends Interface {
     values: [AddressLike, BytesLike[], BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "transferAuthority",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
     functionFragment: "transferOwnership",
     values: [AddressLike]
   ): string;
@@ -400,6 +405,10 @@ export interface PresaleManagerInterface extends Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "setTargetFunctionRole",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "transferAuthority",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -940,6 +949,12 @@ export interface PresaleManager extends BaseContract {
     "nonpayable"
   >;
 
+  transferAuthority: TypedContractMethod<
+    [newAuthority: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+
   transferOwnership: TypedContractMethod<
     [newOwner: AddressLike],
     [void],
@@ -1216,6 +1231,9 @@ export interface PresaleManager extends BaseContract {
     [void],
     "nonpayable"
   >;
+  getFunction(
+    nameOrSignature: "transferAuthority"
+  ): TypedContractMethod<[newAuthority: AddressLike], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "transferOwnership"
   ): TypedContractMethod<[newOwner: AddressLike], [void], "nonpayable">;

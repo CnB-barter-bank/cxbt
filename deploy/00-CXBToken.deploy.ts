@@ -10,6 +10,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     from: useDeployer,
     args: [useDeployer, 5000000],
     log: true,
+    deterministicDeployment: true
   })
 
   console.log(`CXBToken contract: `, token.address)

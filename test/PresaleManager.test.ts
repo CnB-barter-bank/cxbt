@@ -48,11 +48,6 @@ describe('PresaleManager', function () {
     tokenAddress = await token.getAddress()
     managerAddress = await manager.getAddress()
     testTokenAddress = await testToken.getAddress()
-    await manager.pause()
-    await expect(manager.defineToken(tokenAddress))
-    await expect(manager.setRate(testTokenAddress, ethers.parseEther('2')))
-    await manager.unpause()
-
   })
 
   it('Should not pause when caller is not an owner', async function () {
@@ -94,6 +89,33 @@ describe('PresaleManager', function () {
     await expect(
       manager.connect(client).getFunction('setBonus')(NEW_BONUS)
     ).to.be.revertedWithCustomError(manager, 'OwnableUnauthorizedAccount')
+  })
+
+  it('Should transfer authority only when paused', async function () {
+    expect(await token.setAuthority(managerAddress));
+    expect(await token.authority()).to.equal(managerAddress)
+    const newManager = await ethers.deployContract(
+      'PresaleManager',
+      [owner.address, tokenAddress, START_BONUS],
+      owner
+    )
+    const newManagerAddress = await newManager.getAddress() 
+    // cannot transfer authority when another address defined
+    await expect(
+      token.setAuthority(newManagerAddress)
+    ).to.be.revertedWithCustomError(token, 'AccessManagedUnauthorized')
+    // only when paused
+    await expect(
+      manager.transferAuthority(newManagerAddress)
+    ).to.be.revertedWithCustomError(manager, 'ExpectedPause')
+    await manager.pause()
+    // token for the authority should be defined
+    await expect(manager.transferAuthority(newManagerAddress)).to.be.revertedWithCustomError(manager, 'EmptyToken')
+    await manager.defineToken(tokenAddress);
+    expect(await manager.getToken()).to.equal(tokenAddress)
+    await manager.transferAuthority(newManagerAddress)
+    await manager.unpause()
+    expect(await token.authority()).to.equal(newManagerAddress)
   })
 
   it('Should change bonus to  another one only when paused', async function () {
@@ -146,6 +168,10 @@ describe('PresaleManager', function () {
     expect(await manager.getRate(testTokenAddress)).to.equal(newRate)
   })
   it('Should not allow to buy tokens if manager have no free tokens', async function () {
+    await manager.pause()
+    await expect(manager.defineToken(tokenAddress))
+    await expect(manager.setRate(testTokenAddress, ethers.parseEther('2')))
+    await manager.unpause()
     expect(await token.balanceOf(managerAddress)).to.equal(0)
     await testToken.mint(client, E1000)
     expect(await testToken.balanceOf(client)).to.equal(E1000)
@@ -155,24 +181,38 @@ describe('PresaleManager', function () {
       await testToken.allowance(client.address, managerAddress)
     ).to.be.equal(E100)
     await expect(
-      manager.connect(client).getFunction('buy')(testTokenAddress, ethers.parseEther('100'))
+      manager.connect(client).getFunction('buy')(
+        testTokenAddress,
+        ethers.parseEther('100')
+      )
     ).to.be.revertedWithCustomError(manager, 'UnsufficientManagerBalance')
   })
 
   it('Should not allow to buy tokens if client have no money', async function () {
+    await manager.pause()
+    await expect(manager.defineToken(tokenAddress))
+    await expect(manager.setRate(testTokenAddress, ethers.parseEther('2')))
+    await manager.unpause()
     expect(await testToken.balanceOf(client)).to.equal(0)
     await testToken.connect(client).getFunction('approve')(managerAddress, E100)
     expect(
       await testToken.allowance(client.address, managerAddress)
     ).to.be.equal(E100)
     await expect(
-      manager.connect(client).buy(testTokenAddress, ethers.parseEther('100'))
+      manager.connect(client).getFunction('buy')(
+        testTokenAddress,
+        ethers.parseEther('100')
+      )
     ).to.be.revertedWithCustomError(manager, 'UnsufficientBalance')
   })
 
   it('Should buy tokens', async function () {
+    await manager.pause()
+    await expect(manager.defineToken(tokenAddress))
+    await expect(manager.setRate(testTokenAddress, ethers.parseEther('2')))
+    await manager.unpause()
     await token.transfer(managerAddress, E1000)
-    await testToken.transfer(client, E1000);
+    await testToken.transfer(client, E1000)
     expect(await token.balanceOf(managerAddress)).to.equal(E1000)
     expect(await testToken.balanceOf(client)).to.equal(E1000)
     await testToken.connect(client).getFunction('approve')(managerAddress, E100)
@@ -195,6 +235,6 @@ describe('PresaleManager', function () {
       await manager.connect(client).getFunction('buy')(testTokenAddress, E100)
     )
     expect(await token.balanceOf(managerAddress)).to.equal(E760)
-    expect(await token.balanceOf(client.address)).to.equal(E240) 
+    expect(await token.balanceOf(client.address)).to.equal(E240)
   })
 })

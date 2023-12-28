@@ -133,6 +133,7 @@ contract PresaleManager is Ownable, AccessManager, Pausable {
     function getBonus() external view returns (uint256) {
         return bonusPercent - 100;
     }
+    
 
     function canCall(
         address caller,
@@ -184,6 +185,13 @@ contract PresaleManager is Ownable, AccessManager, Pausable {
                 IERC20(currency).balanceOf(address(this))
             )
         ) revert CannotRedeem(currency);
+    }
+
+    function transferAuthority(
+        address newAuthority
+    ) external onlyOwner whenPaused {
+        if (tokenContract == address(0)) revert EmptyToken();
+        IAccessManaged(tokenContract).setAuthority(newAuthority);
     }
 
     function destroy(

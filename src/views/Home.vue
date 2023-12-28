@@ -130,6 +130,7 @@
                   ></ion-row>
                   <ion-row>
                     <ion-col size="12">
+                      <ion-label>Tokens to buy</ion-label>
                       <ion-input
                         :disabled="!token.rate"
                         :value="gainedTokens"
@@ -256,7 +257,7 @@ const purchcaseDisabled = ref(true)
 const offeredTokens = ref('0')
 const gainedTokens = ref('0')
 const bonusTokens = ref('0')
-let coinToken: EthAddressType // = '0x701b22e638Ec0dF950601609B977637b15Ab01ac' // '0x26522BDb9a943D06D38574679bAe99ad30B6B1E0'
+let coinToken: EthAddressType 
 
 const token = ref({} as TokenDataType)
 
@@ -349,11 +350,6 @@ const refreshTokens = async () => {
   setTimeout(refreshTokens, 15000)
 }
 
-// Polygon 137
-// Sepolia 11155111
-// Eth 1
-// Avalanche 43114
-// BSC  56
 
 const tokens = ref([] as TokenDataType[])
 

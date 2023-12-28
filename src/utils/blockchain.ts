@@ -2,6 +2,14 @@ import { Chain } from '@kolirt/vue-web3-auth'
 
 import {address as sepoliaToken} from '../../deployments/sepolia/CXBToken.json'
 import {address as sepoliaManager} from '../../deployments/sepolia/PresaleManager.json'
+import {address as avalancheToken} from '../../deployments/avalanche/CXBToken.json'
+import {address as avalancheManager} from '../../deployments/avalanche/PresaleManager.json'
+import {address as bscToken} from '../../deployments/bsc/CXBToken.json'
+import {address as bscManager} from '../../deployments/bsc/PresaleManager.json'
+import {address as mainnetToken} from '../../deployments/mainnet/CXBToken.json'
+import {address as mainnetManager} from '../../deployments/mainnet/PresaleManager.json'
+import {address as polygonMainnetToken} from '../../deployments/polygon-mainnet/CXBToken.json'
+import {address as polygonMainnetManager} from '../../deployments/polygon-mainnet/PresaleManager.json'
 
 export type TokenDataType = {
   name: string
@@ -43,10 +51,17 @@ export const sepolia: Chain = {
   },
 }
 
+// Polygon 137
+// Sepolia 11155111
+// Eth 1
+// Avalanche 43114
+// BSC  56
+
 export const tokens = [
   {
     chainId: 1,
-    coin: '0x26522BDb9a943D06D38574679bAe99ad30B6B1E0',
+    coin: mainnetToken,
+    // manager: mainnetManager,
     tokens: [
       {
         name: 'EURS',
@@ -137,7 +152,8 @@ export const tokens = [
   },
   {
     chainId: 43114,
-    coin: '0x26522BDb9a943D06D38574679bAe99ad30B6B1E0',
+    coin: avalancheToken,
+    manager:avalancheManager,
     tokens: [
       {
         name: 'USDT',
@@ -173,7 +189,8 @@ export const tokens = [
   },
   {
     chainId: 137,
-    coin: '0x26522BDb9a943D06D38574679bAe99ad30B6B1E0',
+    coin: polygonMainnetToken,
+    manager: polygonMainnetManager,
     tokens: [
       {
         name: 'EURS',
@@ -209,6 +226,8 @@ export const tokens = [
   },
   {
     chainId: 56,
+    coin: bscToken,
+    manager: bscManager,
     tokens: [
       {
         name: 'AGEUR',
