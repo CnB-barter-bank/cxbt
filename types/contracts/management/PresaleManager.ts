@@ -31,19 +31,18 @@ export interface PresaleManagerInterface extends Interface {
       | "SALT"
       | "at"
       | "balanceOf"
+      | "bonus"
       | "buy"
       | "canCall"
       | "cancel"
+      | "cashPercent"
       | "consumeScheduledOp"
-      | "defineToken"
       | "destroy"
       | "execute"
       | "expiration"
       | "freeze"
       | "getAccess"
-      | "getBonus"
       | "getNonce"
-      | "getRate"
       | "getResultAmount"
       | "getRoleAdmin"
       | "getRoleGrantDelay"
@@ -51,7 +50,6 @@ export interface PresaleManagerInterface extends Interface {
       | "getSchedule"
       | "getTargetAdminDelay"
       | "getTargetFunctionRole"
-      | "getToken"
       | "grantRole"
       | "hasRate"
       | "hasRole"
@@ -64,12 +62,14 @@ export interface PresaleManagerInterface extends Interface {
       | "owner"
       | "pause"
       | "paused"
+      | "rate"
       | "redeem"
       | "renounceOwnership"
       | "renounceRole"
       | "revokeRole"
       | "schedule"
       | "setBonus"
+      | "setCashPercent"
       | "setGrantDelay"
       | "setRate"
       | "setRoleAdmin"
@@ -77,11 +77,17 @@ export interface PresaleManagerInterface extends Interface {
       | "setTargetAdminDelay"
       | "setTargetClosed"
       | "setTargetFunctionRole"
+      | "setToken"
+      | "setTokenPercent"
+      | "setVesting"
+      | "token"
+      | "tokenPercent"
       | "transferAuthority"
       | "transferOwnership"
       | "unfreeze"
       | "unpause"
       | "updateAuthority"
+      | "vesting"
   ): FunctionFragment;
 
   getEvent(
@@ -92,6 +98,7 @@ export interface PresaleManagerInterface extends Interface {
       | "OperationScheduled"
       | "OwnershipTransferred"
       | "Paused"
+      | "ReferralsProvided"
       | "RoleAdminChanged"
       | "RoleGrantDelayChanged"
       | "RoleGranted"
@@ -118,9 +125,10 @@ export interface PresaleManagerInterface extends Interface {
     functionFragment: "balanceOf",
     values: [AddressLike]
   ): string;
+  encodeFunctionData(functionFragment: "bonus", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "buy",
-    values: [AddressLike, BigNumberish]
+    values: [AddressLike, BigNumberish, AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "canCall",
@@ -131,12 +139,12 @@ export interface PresaleManagerInterface extends Interface {
     values: [AddressLike, AddressLike, BytesLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "consumeScheduledOp",
-    values: [AddressLike, BytesLike]
+    functionFragment: "cashPercent",
+    values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "defineToken",
-    values: [AddressLike]
+    functionFragment: "consumeScheduledOp",
+    values: [AddressLike, BytesLike]
   ): string;
   encodeFunctionData(
     functionFragment: "destroy",
@@ -155,12 +163,7 @@ export interface PresaleManagerInterface extends Interface {
     functionFragment: "getAccess",
     values: [BigNumberish, AddressLike]
   ): string;
-  encodeFunctionData(functionFragment: "getBonus", values?: undefined): string;
   encodeFunctionData(functionFragment: "getNonce", values: [BytesLike]): string;
-  encodeFunctionData(
-    functionFragment: "getRate",
-    values: [AddressLike]
-  ): string;
   encodeFunctionData(
     functionFragment: "getResultAmount",
     values: [AddressLike, BigNumberish]
@@ -189,7 +192,6 @@ export interface PresaleManagerInterface extends Interface {
     functionFragment: "getTargetFunctionRole",
     values: [AddressLike, BytesLike]
   ): string;
-  encodeFunctionData(functionFragment: "getToken", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "grantRole",
     values: [BigNumberish, AddressLike, BigNumberish]
@@ -226,6 +228,7 @@ export interface PresaleManagerInterface extends Interface {
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
   encodeFunctionData(functionFragment: "pause", values?: undefined): string;
   encodeFunctionData(functionFragment: "paused", values?: undefined): string;
+  encodeFunctionData(functionFragment: "rate", values: [AddressLike]): string;
   encodeFunctionData(
     functionFragment: "redeem",
     values: [AddressLike, AddressLike]
@@ -248,6 +251,10 @@ export interface PresaleManagerInterface extends Interface {
   ): string;
   encodeFunctionData(
     functionFragment: "setBonus",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setCashPercent",
     values: [BigNumberish]
   ): string;
   encodeFunctionData(
@@ -279,6 +286,23 @@ export interface PresaleManagerInterface extends Interface {
     values: [AddressLike, BytesLike[], BigNumberish]
   ): string;
   encodeFunctionData(
+    functionFragment: "setToken",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setTokenPercent",
+    values: [BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "setVesting",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(functionFragment: "token", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "tokenPercent",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
     functionFragment: "transferAuthority",
     values: [AddressLike]
   ): string;
@@ -295,6 +319,7 @@ export interface PresaleManagerInterface extends Interface {
     functionFragment: "updateAuthority",
     values: [AddressLike, AddressLike]
   ): string;
+  encodeFunctionData(functionFragment: "vesting", values?: undefined): string;
 
   decodeFunctionResult(functionFragment: "ADMIN_ROLE", data: BytesLike): Result;
   decodeFunctionResult(
@@ -304,15 +329,16 @@ export interface PresaleManagerInterface extends Interface {
   decodeFunctionResult(functionFragment: "SALT", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "at", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "bonus", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "buy", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "canCall", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "cancel", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "consumeScheduledOp",
+    functionFragment: "cashPercent",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "defineToken",
+    functionFragment: "consumeScheduledOp",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "destroy", data: BytesLike): Result;
@@ -320,9 +346,7 @@ export interface PresaleManagerInterface extends Interface {
   decodeFunctionResult(functionFragment: "expiration", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "freeze", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "getAccess", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "getBonus", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "getNonce", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "getRate", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "getResultAmount",
     data: BytesLike
@@ -351,7 +375,6 @@ export interface PresaleManagerInterface extends Interface {
     functionFragment: "getTargetFunctionRole",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "getToken", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "grantRole", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "hasRate", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "hasRole", data: BytesLike): Result;
@@ -370,6 +393,7 @@ export interface PresaleManagerInterface extends Interface {
   decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "pause", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "rate", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "redeem", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "renounceOwnership",
@@ -382,6 +406,10 @@ export interface PresaleManagerInterface extends Interface {
   decodeFunctionResult(functionFragment: "revokeRole", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "schedule", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "setBonus", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "setCashPercent",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "setGrantDelay",
     data: BytesLike
@@ -407,6 +435,17 @@ export interface PresaleManagerInterface extends Interface {
     functionFragment: "setTargetFunctionRole",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "setToken", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "setTokenPercent",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "setVesting", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "token", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "tokenPercent",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "transferAuthority",
     data: BytesLike
@@ -421,6 +460,7 @@ export interface PresaleManagerInterface extends Interface {
     functionFragment: "updateAuthority",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "vesting", data: BytesLike): Result;
 }
 
 export namespace BoughtTokensEvent {
@@ -523,6 +563,37 @@ export namespace PausedEvent {
   export type OutputTuple = [account: string];
   export interface OutputObject {
     account: string;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace ReferralsProvidedEvent {
+  export type InputTuple = [
+    sender: AddressLike,
+    referral: AddressLike,
+    currency: AddressLike,
+    amount: BigNumberish,
+    cashAmount: BigNumberish,
+    tokenAmount: BigNumberish
+  ];
+  export type OutputTuple = [
+    sender: string,
+    referral: string,
+    currency: string,
+    amount: bigint,
+    cashAmount: bigint,
+    tokenAmount: bigint
+  ];
+  export interface OutputObject {
+    sender: string;
+    referral: string;
+    currency: string;
+    amount: bigint;
+    cashAmount: bigint;
+    tokenAmount: bigint;
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -742,8 +813,10 @@ export interface PresaleManager extends BaseContract {
 
   balanceOf: TypedContractMethod<[currency: AddressLike], [bigint], "view">;
 
+  bonus: TypedContractMethod<[], [bigint], "view">;
+
   buy: TypedContractMethod<
-    [currency: AddressLike, value: BigNumberish],
+    [currency: AddressLike, value: BigNumberish, referral: AddressLike],
     [boolean],
     "nonpayable"
   >;
@@ -760,13 +833,13 @@ export interface PresaleManager extends BaseContract {
     "nonpayable"
   >;
 
+  cashPercent: TypedContractMethod<[], [bigint], "view">;
+
   consumeScheduledOp: TypedContractMethod<
     [caller: AddressLike, data: BytesLike],
     [void],
     "nonpayable"
   >;
-
-  defineToken: TypedContractMethod<[_token: AddressLike], [void], "nonpayable">;
 
   destroy: TypedContractMethod<
     [_to: AddressLike, newAuthority: AddressLike],
@@ -797,11 +870,7 @@ export interface PresaleManager extends BaseContract {
     "view"
   >;
 
-  getBonus: TypedContractMethod<[], [bigint], "view">;
-
   getNonce: TypedContractMethod<[id: BytesLike], [bigint], "view">;
-
-  getRate: TypedContractMethod<[currency: AddressLike], [bigint], "view">;
 
   getResultAmount: TypedContractMethod<
     [currency: AddressLike, value: BigNumberish],
@@ -836,8 +905,6 @@ export interface PresaleManager extends BaseContract {
     [bigint],
     "view"
   >;
-
-  getToken: TypedContractMethod<[], [string], "view">;
 
   grantRole: TypedContractMethod<
     [roleId: BigNumberish, account: AddressLike, executionDelay: BigNumberish],
@@ -879,6 +946,8 @@ export interface PresaleManager extends BaseContract {
 
   paused: TypedContractMethod<[], [boolean], "view">;
 
+  rate: TypedContractMethod<[currency: AddressLike], [bigint], "view">;
+
   redeem: TypedContractMethod<
     [currency: AddressLike, _to: AddressLike],
     [void],
@@ -906,6 +975,12 @@ export interface PresaleManager extends BaseContract {
   >;
 
   setBonus: TypedContractMethod<[bonus: BigNumberish], [void], "nonpayable">;
+
+  setCashPercent: TypedContractMethod<
+    [percent: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
 
   setGrantDelay: TypedContractMethod<
     [roleId: BigNumberish, newDelay: BigNumberish],
@@ -949,6 +1024,24 @@ export interface PresaleManager extends BaseContract {
     "nonpayable"
   >;
 
+  setToken: TypedContractMethod<[_token: AddressLike], [void], "nonpayable">;
+
+  setTokenPercent: TypedContractMethod<
+    [percent: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+
+  setVesting: TypedContractMethod<
+    [_vesting: AddressLike],
+    [void],
+    "nonpayable"
+  >;
+
+  token: TypedContractMethod<[], [string], "view">;
+
+  tokenPercent: TypedContractMethod<[], [bigint], "view">;
+
   transferAuthority: TypedContractMethod<
     [newAuthority: AddressLike],
     [void],
@@ -971,6 +1064,8 @@ export interface PresaleManager extends BaseContract {
     "nonpayable"
   >;
 
+  vesting: TypedContractMethod<[], [string], "view">;
+
   getFunction<T extends ContractMethod = ContractMethod>(
     key: string | FunctionFragment
   ): T;
@@ -991,9 +1086,12 @@ export interface PresaleManager extends BaseContract {
     nameOrSignature: "balanceOf"
   ): TypedContractMethod<[currency: AddressLike], [bigint], "view">;
   getFunction(
+    nameOrSignature: "bonus"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
     nameOrSignature: "buy"
   ): TypedContractMethod<
-    [currency: AddressLike, value: BigNumberish],
+    [currency: AddressLike, value: BigNumberish, referral: AddressLike],
     [boolean],
     "nonpayable"
   >;
@@ -1012,15 +1110,15 @@ export interface PresaleManager extends BaseContract {
     "nonpayable"
   >;
   getFunction(
+    nameOrSignature: "cashPercent"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
     nameOrSignature: "consumeScheduledOp"
   ): TypedContractMethod<
     [caller: AddressLike, data: BytesLike],
     [void],
     "nonpayable"
   >;
-  getFunction(
-    nameOrSignature: "defineToken"
-  ): TypedContractMethod<[_token: AddressLike], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "destroy"
   ): TypedContractMethod<
@@ -1056,14 +1154,8 @@ export interface PresaleManager extends BaseContract {
     "view"
   >;
   getFunction(
-    nameOrSignature: "getBonus"
-  ): TypedContractMethod<[], [bigint], "view">;
-  getFunction(
     nameOrSignature: "getNonce"
   ): TypedContractMethod<[id: BytesLike], [bigint], "view">;
-  getFunction(
-    nameOrSignature: "getRate"
-  ): TypedContractMethod<[currency: AddressLike], [bigint], "view">;
   getFunction(
     nameOrSignature: "getResultAmount"
   ): TypedContractMethod<
@@ -1093,9 +1185,6 @@ export interface PresaleManager extends BaseContract {
     [bigint],
     "view"
   >;
-  getFunction(
-    nameOrSignature: "getToken"
-  ): TypedContractMethod<[], [string], "view">;
   getFunction(
     nameOrSignature: "grantRole"
   ): TypedContractMethod<
@@ -1149,6 +1238,9 @@ export interface PresaleManager extends BaseContract {
     nameOrSignature: "paused"
   ): TypedContractMethod<[], [boolean], "view">;
   getFunction(
+    nameOrSignature: "rate"
+  ): TypedContractMethod<[currency: AddressLike], [bigint], "view">;
+  getFunction(
     nameOrSignature: "redeem"
   ): TypedContractMethod<
     [currency: AddressLike, _to: AddressLike],
@@ -1182,6 +1274,9 @@ export interface PresaleManager extends BaseContract {
   getFunction(
     nameOrSignature: "setBonus"
   ): TypedContractMethod<[bonus: BigNumberish], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "setCashPercent"
+  ): TypedContractMethod<[percent: BigNumberish], [void], "nonpayable">;
   getFunction(
     nameOrSignature: "setGrantDelay"
   ): TypedContractMethod<
@@ -1232,6 +1327,21 @@ export interface PresaleManager extends BaseContract {
     "nonpayable"
   >;
   getFunction(
+    nameOrSignature: "setToken"
+  ): TypedContractMethod<[_token: AddressLike], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "setTokenPercent"
+  ): TypedContractMethod<[percent: BigNumberish], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "setVesting"
+  ): TypedContractMethod<[_vesting: AddressLike], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "token"
+  ): TypedContractMethod<[], [string], "view">;
+  getFunction(
+    nameOrSignature: "tokenPercent"
+  ): TypedContractMethod<[], [bigint], "view">;
+  getFunction(
     nameOrSignature: "transferAuthority"
   ): TypedContractMethod<[newAuthority: AddressLike], [void], "nonpayable">;
   getFunction(
@@ -1250,6 +1360,9 @@ export interface PresaleManager extends BaseContract {
     [void],
     "nonpayable"
   >;
+  getFunction(
+    nameOrSignature: "vesting"
+  ): TypedContractMethod<[], [string], "view">;
 
   getEvent(
     key: "BoughtTokens"
@@ -1292,6 +1405,13 @@ export interface PresaleManager extends BaseContract {
     PausedEvent.InputTuple,
     PausedEvent.OutputTuple,
     PausedEvent.OutputObject
+  >;
+  getEvent(
+    key: "ReferralsProvided"
+  ): TypedContractEvent<
+    ReferralsProvidedEvent.InputTuple,
+    ReferralsProvidedEvent.OutputTuple,
+    ReferralsProvidedEvent.OutputObject
   >;
   getEvent(
     key: "RoleAdminChanged"
@@ -1429,6 +1549,17 @@ export interface PresaleManager extends BaseContract {
       PausedEvent.InputTuple,
       PausedEvent.OutputTuple,
       PausedEvent.OutputObject
+    >;
+
+    "ReferralsProvided(address,address,address,uint256,uint256,uint256)": TypedContractEvent<
+      ReferralsProvidedEvent.InputTuple,
+      ReferralsProvidedEvent.OutputTuple,
+      ReferralsProvidedEvent.OutputObject
+    >;
+    ReferralsProvided: TypedContractEvent<
+      ReferralsProvidedEvent.InputTuple,
+      ReferralsProvidedEvent.OutputTuple,
+      ReferralsProvidedEvent.OutputObject
     >;
 
     "RoleAdminChanged(uint64,uint64)": TypedContractEvent<

@@ -24,7 +24,7 @@
         <ion-row class="ion-justify-content-center">
           <ion-col size="auto">
             <ion-card
-              v-if="account.connected"
+              v-if="account.connected && !disabled"
               style="min-height: 300px"
               class="sizeMd"
             >
@@ -172,7 +172,10 @@
                 </ion-grid>
               </ion-card-content>
             </ion-card>
-            <ion-card v-else style="min-height: 300px">
+            <ion-card
+              v-if="!account.connected && !disabled"
+              style="min-height: 300px"
+            >
               <ion-card-header>
                 <ion-card-title>Buy CXBT tokens</ion-card-title>
               </ion-card-header>
@@ -180,6 +183,67 @@
                 To purchase CXBT tokens you need to connect your wallet.
               </ion-card-content>
               <ion-button expand="block" @click="connect">Connect</ion-button>
+            </ion-card>
+            <ion-card v-if="disabled" style="min-height: 300px">
+              <ion-card-header>
+                <ion-card-title>Buy CXBT tokens</ion-card-title>
+              </ion-card-header>
+              <ion-card-content style="min-height: 200px; padding-top: 90px">
+                <p>
+                  Unfortunately presale is not started yet due technical
+                  reasons.<br />
+                  You can contact us and leave a priority request using the
+                  following details:<br />
+                  Email:
+                  <a href="mailto:support@clearingandbarterhouse.eu"
+                    >support@clearingandbarterhouse.eu</a
+                  ><br />
+                  Telegram:
+                  <a href="https://t.me/ClearingAndBarterHouse" target="_blank"
+                    >@ClearingAndBarterHouse</a
+                  ><br />
+                  Or fill this form to receive a free call
+                </p>
+
+                <ion-list :inset="true">
+                  <ion-item>
+                    <ion-input
+                      v-model="name"
+                      label="Your name"
+                      placeholder="Enter your name"
+                    ></ion-input>
+                  </ion-item>
+
+                  <ion-item>
+                    <ion-input
+                      v-model="phone"
+                      label="Phone or nickname"
+                      placeholder="Enter your phone or nickname"
+                    ></ion-input>
+                  </ion-item>
+                  <ion-item lines="none">
+                    <ion-segment v-model="service">
+                      <ion-segment-button value="call">
+                        <ion-label>Direct call</ion-label>
+                      </ion-segment-button>
+                      <ion-segment-button value="whatsapp">
+                        <ion-label>Whatsapp</ion-label>
+                      </ion-segment-button>
+                      <ion-segment-button value="viber">
+                        <ion-label>Viber</ion-label>
+                      </ion-segment-button>
+                      <ion-segment-button value="telegram">
+                        <ion-label>Telegram</ion-label>
+                      </ion-segment-button>
+                    </ion-segment></ion-item
+                  >
+                  <ion-item lines="none">
+                    <ion-button @click="contactMe" expand="block" size="default"
+                      >Request a free call</ion-button
+                    >
+                  </ion-item>
+                </ion-list>
+              </ion-card-content>
             </ion-card>
           </ion-col>
         </ion-row>
@@ -211,6 +275,13 @@ import {
   IonSelectOption,
   IonInput,
   IonLabel,
+  IonList,
+  IonItem,
+  IonRadioGroup,
+  IonRadio,
+  IonSegmentButton,
+  IonSegment,
+  toastController,
 } from '@ionic/vue'
 import { useMainStore } from '../stores/main.store'
 import {
@@ -250,6 +321,10 @@ import {
 import { abi as managerABI } from '../../artifacts/contracts/management/PresaleManager.sol/PresaleManager.json'
 import { abi as tokenABI } from '../../artifacts/contracts/tokens/CXBToken.sol/CXBToken.json'
 
+const disabled = ref(true)
+const name = ref('')
+const phone = ref('')
+const service = ref('call')
 const chains = getAvailableChains()
 const mainStore = useMainStore()
 const switchingTo = {} as any
@@ -257,12 +332,50 @@ const purchcaseDisabled = ref(true)
 const offeredTokens = ref('0')
 const gainedTokens = ref('0')
 const bonusTokens = ref('0')
-let coinToken: EthAddressType 
+let coinToken: EthAddressType
 
 const token = ref({} as TokenDataType)
 
 const coinAmount = ref('')
 const tokenAmount = ref('')
+
+const contactMe = async () => {
+  if (phone.value == '' || name.value == '') {
+    const toast = await toastController.create({
+      message: 'Empty fields!',
+      duration: 1500,
+      position: 'top',
+      color: 'danger',
+    })
+
+    await toast.present()
+    return
+  }
+  const response = await fetch(
+    'https://cxbt-services.miniapp.workers.dev/api/email',
+    {
+      method: 'POST', // *GET, POST, PUT, DELETE, etc.
+      mode: 'no-cors', // no-cors, *cors, same-origin
+      cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        service: service.value,
+        phone: service.value == 'telegram' ? '@' + phone.value : phone.value,
+        name: name.value,
+      }),
+    }
+  )
+  const toast = await toastController.create({
+      message: 'Thank you, we\'ll certainly get in contact with you',
+      duration: 1500,
+      position: 'top',
+      color: 'success',
+    })
+
+    await toast.present()
+}
 
 const initialize = async (): Promise<any> => {
   if (!account || !account.connected) {
@@ -326,7 +439,7 @@ const formatValue = (raw: string, trim = true) => {
   let [m, l] = raw.split('.', 2)
   while (m.length > 1 && m[0] == '0') m = m.substring(1)
   if (!l) return m
-  if (trim) l = l.substring(0, 4);
+  if (trim) l = l.substring(0, 4)
   while (l.length > 0 && l.substring(l.length - 1) == '0')
     l = l.substring(0, l.length - 1)
   return `${m}.${l}`
@@ -349,7 +462,6 @@ const refreshTokens = async () => {
   await populateBalances()
   setTimeout(refreshTokens, 15000)
 }
-
 
 const tokens = ref([] as TokenDataType[])
 

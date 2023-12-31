@@ -63,7 +63,7 @@ describe('CXBToken', function () {
 
   it('Should not to freeze without rights', async function () {
     await manager.pause()
-    await manager.defineToken(tokenAddress)
+    await manager.setToken(tokenAddress)
     await manager.unpause()
     await expect(
       token.connect(client).getFunction('freeze')(owner.address)
@@ -73,7 +73,7 @@ describe('CXBToken', function () {
   it('Should not to transfer funds if one of accounts is freezed', async function () {
     expect(await token.authority()).to.equal(managerAddress)
     await manager.pause()
-    await manager.defineToken(tokenAddress)
+    await manager.setToken(tokenAddress)
     await manager.unpause()
     await token.transfer(client.address, E200)
     await token.freeze(owner.address)
