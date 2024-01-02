@@ -190,9 +190,10 @@
               </ion-card-header>
               <ion-card-content style="min-height: 200px; padding-top: 90px">
                 <p>
-                  Unfortunately presale is not started yet due technical
-                  reasons.<br />
-                  You can contact us and leave a priority request using the
+                  Due to holidays, we are technically unable to do our token sale automatically.
+But you can contact  with us 24 hours  to write to us or to order a return call;
+Naturally, as always for all last years, with great attention and personal bonuses.<br />
+                  You can contact us using the
                   following details:<br />
                   Email:
                   <a href="mailto:support@clearingandbarterhouse.eu"
