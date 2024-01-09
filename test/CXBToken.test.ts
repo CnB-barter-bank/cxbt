@@ -1,17 +1,20 @@
-import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers'
 import { expect } from 'chai'
-import { Contract } from 'ethers'
 import { ethers } from 'hardhat'
-import { zeroAddress } from 'viem'
+const { loadFixture } = require('@nomicfoundation/hardhat-network-helpers')
+
+const encode = (signature) => {
+  return ethers.FunctionFragment.from(signature).selector
+}
 
 const START_BONUS = 20
 const NEW_BONUS = 40
+const E1 = ethers.parseEther('1')
 const E100 = ethers.parseEther('100')
 const E200 = ethers.parseEther('200')
 const E240 = ethers.parseEther('240')
 const E760 = ethers.parseEther('760')
 const E1000 = ethers.parseEther('1000')
-
+const ETHER_PRICE = 2000000000
 const getOwnerAccount = async () => {
   const [owner] = await ethers.getSigners()
   return owner
@@ -23,69 +26,100 @@ const getClientAccount = async () => {
 }
 
 describe('CXBToken', function () {
-  let token: Contract
-  let manager: Contract
-  let testToken: Contract
-  let owner: HardhatEthersSigner
-  let client: HardhatEthersSigner
-  let managerAddress
-  let tokenAddress
-  beforeEach(async () => {
-    owner = await getOwnerAccount()
-    client = await getClientAccount()
-    token = await ethers.deployContract(
+  async function fixture() {
+    const [owner, client, referral] = await ethers.getSigners()
+    const token = await ethers.deployContract(
       'CXBToken',
       [owner.address, ethers.parseEther('10000')],
       owner
     )
-    manager = await ethers.deployContract(
-      'PresaleManager',
-      [owner.address, zeroAddress, START_BONUS],
+    const tokenAddress = await token.getAddress()
+
+    const mock = await ethers.deployContract(
+      'MockERC20',
+      [ethers.parseEther('10000')],
       owner
     )
-    tokenAddress= await token.getAddress();
-    managerAddress = await manager.getAddress();
+    const mockAddress = await mock.getAddress()
+    await mock.transfer(client, E1000)
+    const manager = await ethers.deployContract(
+      'PresaleManager',
+      [owner.address, [tokenAddress]],
+      owner
+    )
+    const managerAddress = await manager.getAddress()
+    await manager.grantRole(0, owner.address, 0) 
     await token.setAuthority(managerAddress)
-    testToken = await ethers.deployContract('TestToken', [owner.address], owner)
-    await token.transfer(managerAddress, ethers.parseEther('1000'))
-    await testToken.mint(managerAddress, ethers.parseEther('1000'))  
+    const chainlink = await ethers.deployContract(
+      'MockChainlink',
+      [ETHER_PRICE],
+      owner
+    )
+    const chainlinkAddress = await chainlink.getAddress()
+    const purchase = await ethers.deployContract(
+      'CXBTokenPurchase',
+      [tokenAddress, chainlinkAddress, 1, START_BONUS, managerAddress], 
+      {value: E100}
+    )
+    const purchaseAddress = await purchase.getAddress()
+    await manager.connect(owner).addWorker(purchaseAddress)
+    await purchase.setRate(mockAddress, E1)
+    const funcs = [
+      'withdraw(address,address)',
+      'withdraw(address)',
+      'clean(address,address)'
+    ].map(encode) 
+    await manager.setTargetFunctionRole(purchaseAddress, funcs, 0)
+    return {
+      owner,
+      client,
+      token,
+      manager,
+      purchase,
+      managerAddress,
+      tokenAddress,
+      purchaseAddress,
+      chainlink,
+      chainlinkAddress,
+      mock,
+      mockAddress,
+      referral,
+    }
+  }
+  beforeEach(async function () {
+    Object.assign(this, await loadFixture(fixture))
   })
 
+
   it('Should use the correct authority', async function () { 
-    expect(await token.authority()).to.equal(managerAddress)
+    expect(await this.token.authority()).to.equal(this.managerAddress)
   })
 
   it('Should transfer correctly', async function () {
     const amount = '1000000'
-    await token.transfer(client.address, amount)
-    expect(await token.balanceOf(client.address)).to.equal(amount)
+    await this.token.transfer(this.client.address, amount)
+    expect(await this.token.balanceOf(this.client.address)).to.equal(amount)
   })
 
   it('Should not to freeze without rights', async function () {
-    await manager.pause()
-    await manager.setToken(tokenAddress)
-    await manager.unpause()
     await expect(
-      token.connect(client).getFunction('freeze')(owner.address)
-    ).to.be.revertedWithCustomError(token,'AccessManagedUnauthorized')
+      this.token.connect(this.client).freeze(this.owner.address)
+    ).to.be.revertedWithCustomError(this.token,'AccessManagedUnauthorized')
   })
 
   it('Should not to transfer funds if one of accounts is freezed', async function () {
-    expect(await token.authority()).to.equal(managerAddress)
-    await manager.pause()
-    await manager.setToken(tokenAddress)
-    await manager.unpause()
-    await token.transfer(client.address, E200)
-    await token.freeze(owner.address)
+    expect(await this.token.authority()).to.equal(this.managerAddress)
+    await this.token.transfer(this.client.address, E200)
+    await this.token.freeze(this.owner.address)
     await expect(
-      token.connect(client).getFunction('transfer')(owner.address, E100)
-    ).to.be.revertedWithCustomError(token,'EnforcedFreeze')
-    await expect(token.transfer(client.address, E100)).to.be.revertedWithCustomError(token,
+      this.token.connect(this.client).transfer(this.owner.address, E100)
+    ).to.be.revertedWithCustomError(this.token,'EnforcedFreeze')
+    await expect(this.token.transfer(this.client.address, E100)).to.be.revertedWithCustomError(this.token,
       'EnforcedFreeze'
     )
-    await token.unfreeze(owner.address)
-    expect(await token.balanceOf(client.address)).to.equal(E200)
-    await token.connect(client).getFunction('transfer')(owner.address, E100)
-    expect(await token.balanceOf(client.address)).to.equal(E100)
+    await this.token.unfreeze(this.owner.address)
+    expect(await this.token.balanceOf(this.client.address)).to.equal(E200)
+    await this.token.connect(this.client).transfer(this.owner.address, E100)
+    expect(await this.token.balanceOf(this.client.address)).to.equal(E100) 
   })
 })

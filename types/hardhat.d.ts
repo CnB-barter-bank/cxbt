@@ -14,6 +14,54 @@ import * as Contracts from ".";
 declare module "hardhat/types/runtime" {
   interface HardhatEthersHelpers extends HardhatEthersHelpersBase {
     getContractFactory(
+      name: "Airdrop",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.Airdrop__factory>;
+    getContractFactory(
+      name: "IAirdrop",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IAirdrop__factory>;
+    getContractFactory(
+      name: "IPurchase",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IPurchase__factory>;
+    getContractFactory(
+      name: "IVesting",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IVesting__factory>;
+    getContractFactory(
+      name: "Purchase",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.Purchase__factory>;
+    getContractFactory(
+      name: "TransferableAccessManager",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.TransferableAccessManager__factory>;
+    getContractFactory(
+      name: "Vesting",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.Vesting__factory>;
+    getContractFactory(
+      name: "Freezable",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.Freezable__factory>;
+    getContractFactory(
+      name: "IFreezable",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IFreezable__factory>;
+    getContractFactory(
+      name: "AggregatorInterface",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.AggregatorInterface__factory>;
+    getContractFactory(
+      name: "AggregatorV2V3Interface",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.AggregatorV2V3Interface__factory>;
+    getContractFactory(
+      name: "AggregatorV3Interface",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.AggregatorV3Interface__factory>;
+    getContractFactory(
       name: "AccessManaged",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.AccessManaged__factory>;
@@ -134,34 +182,94 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.EnumerableMap__factory>;
     getContractFactory(
-      name: "PresaleManager",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.PresaleManager__factory>;
-    getContractFactory(
-      name: "CXBToken",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.CXBToken__factory>;
-    getContractFactory(
-      name: "Freezable",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.Freezable__factory>;
-    getContractFactory(
-      name: "IFreezable",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IFreezable__factory>;
-    getContractFactory(
-      name: "TestToken",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.TestToken__factory>;
-    getContractFactory(
       name: "CXBTokenAirdrop",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.CXBTokenAirdrop__factory>;
     getContractFactory(
+      name: "CXBTokenPurchase",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.CXBTokenPurchase__factory>;
+    getContractFactory(
       name: "CXBTokenVesting",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.CXBTokenVesting__factory>;
+    getContractFactory(
+      name: "PresaleManager",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.PresaleManager__factory>;
+    getContractFactory(
+      name: "MockChainlink",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.MockChainlink__factory>;
+    getContractFactory(
+      name: "MockERC20",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.MockERC20__factory>;
+    getContractFactory(
+      name: "CXBToken",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.CXBToken__factory>;
 
+    getContractAt(
+      name: "Airdrop",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.Airdrop>;
+    getContractAt(
+      name: "IAirdrop",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IAirdrop>;
+    getContractAt(
+      name: "IPurchase",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IPurchase>;
+    getContractAt(
+      name: "IVesting",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IVesting>;
+    getContractAt(
+      name: "Purchase",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.Purchase>;
+    getContractAt(
+      name: "TransferableAccessManager",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.TransferableAccessManager>;
+    getContractAt(
+      name: "Vesting",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.Vesting>;
+    getContractAt(
+      name: "Freezable",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.Freezable>;
+    getContractAt(
+      name: "IFreezable",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IFreezable>;
+    getContractAt(
+      name: "AggregatorInterface",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.AggregatorInterface>;
+    getContractAt(
+      name: "AggregatorV2V3Interface",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.AggregatorV2V3Interface>;
+    getContractAt(
+      name: "AggregatorV3Interface",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.AggregatorV3Interface>;
     getContractAt(
       name: "AccessManaged",
       address: string | ethers.Addressable,
@@ -313,41 +421,89 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.EnumerableMap>;
     getContractAt(
-      name: "PresaleManager",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.PresaleManager>;
-    getContractAt(
-      name: "CXBToken",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.CXBToken>;
-    getContractAt(
-      name: "Freezable",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.Freezable>;
-    getContractAt(
-      name: "IFreezable",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.IFreezable>;
-    getContractAt(
-      name: "TestToken",
-      address: string | ethers.Addressable,
-      signer?: ethers.Signer
-    ): Promise<Contracts.TestToken>;
-    getContractAt(
       name: "CXBTokenAirdrop",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.CXBTokenAirdrop>;
     getContractAt(
+      name: "CXBTokenPurchase",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.CXBTokenPurchase>;
+    getContractAt(
       name: "CXBTokenVesting",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.CXBTokenVesting>;
+    getContractAt(
+      name: "PresaleManager",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.PresaleManager>;
+    getContractAt(
+      name: "MockChainlink",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.MockChainlink>;
+    getContractAt(
+      name: "MockERC20",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.MockERC20>;
+    getContractAt(
+      name: "CXBToken",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.CXBToken>;
 
+    deployContract(
+      name: "Airdrop",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.Airdrop>;
+    deployContract(
+      name: "IAirdrop",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IAirdrop>;
+    deployContract(
+      name: "IPurchase",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IPurchase>;
+    deployContract(
+      name: "IVesting",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IVesting>;
+    deployContract(
+      name: "Purchase",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.Purchase>;
+    deployContract(
+      name: "TransferableAccessManager",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.TransferableAccessManager>;
+    deployContract(
+      name: "Vesting",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.Vesting>;
+    deployContract(
+      name: "Freezable",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.Freezable>;
+    deployContract(
+      name: "IFreezable",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IFreezable>;
+    deployContract(
+      name: "AggregatorInterface",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.AggregatorInterface>;
+    deployContract(
+      name: "AggregatorV2V3Interface",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.AggregatorV2V3Interface>;
+    deployContract(
+      name: "AggregatorV3Interface",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.AggregatorV3Interface>;
     deployContract(
       name: "AccessManaged",
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -469,34 +625,94 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.EnumerableMap>;
     deployContract(
-      name: "PresaleManager",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.PresaleManager>;
-    deployContract(
-      name: "CXBToken",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.CXBToken>;
-    deployContract(
-      name: "Freezable",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.Freezable>;
-    deployContract(
-      name: "IFreezable",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.IFreezable>;
-    deployContract(
-      name: "TestToken",
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.TestToken>;
-    deployContract(
       name: "CXBTokenAirdrop",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.CXBTokenAirdrop>;
     deployContract(
+      name: "CXBTokenPurchase",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.CXBTokenPurchase>;
+    deployContract(
       name: "CXBTokenVesting",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.CXBTokenVesting>;
+    deployContract(
+      name: "PresaleManager",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.PresaleManager>;
+    deployContract(
+      name: "MockChainlink",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.MockChainlink>;
+    deployContract(
+      name: "MockERC20",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.MockERC20>;
+    deployContract(
+      name: "CXBToken",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.CXBToken>;
 
+    deployContract(
+      name: "Airdrop",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.Airdrop>;
+    deployContract(
+      name: "IAirdrop",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IAirdrop>;
+    deployContract(
+      name: "IPurchase",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IPurchase>;
+    deployContract(
+      name: "IVesting",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IVesting>;
+    deployContract(
+      name: "Purchase",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.Purchase>;
+    deployContract(
+      name: "TransferableAccessManager",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.TransferableAccessManager>;
+    deployContract(
+      name: "Vesting",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.Vesting>;
+    deployContract(
+      name: "Freezable",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.Freezable>;
+    deployContract(
+      name: "IFreezable",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IFreezable>;
+    deployContract(
+      name: "AggregatorInterface",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.AggregatorInterface>;
+    deployContract(
+      name: "AggregatorV2V3Interface",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.AggregatorV2V3Interface>;
+    deployContract(
+      name: "AggregatorV3Interface",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.AggregatorV3Interface>;
     deployContract(
       name: "AccessManaged",
       args: any[],
@@ -648,40 +864,40 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.EnumerableMap>;
     deployContract(
-      name: "PresaleManager",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.PresaleManager>;
-    deployContract(
-      name: "CXBToken",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.CXBToken>;
-    deployContract(
-      name: "Freezable",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.Freezable>;
-    deployContract(
-      name: "IFreezable",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.IFreezable>;
-    deployContract(
-      name: "TestToken",
-      args: any[],
-      signerOrOptions?: ethers.Signer | DeployContractOptions
-    ): Promise<Contracts.TestToken>;
-    deployContract(
       name: "CXBTokenAirdrop",
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.CXBTokenAirdrop>;
     deployContract(
+      name: "CXBTokenPurchase",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.CXBTokenPurchase>;
+    deployContract(
       name: "CXBTokenVesting",
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.CXBTokenVesting>;
+    deployContract(
+      name: "PresaleManager",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.PresaleManager>;
+    deployContract(
+      name: "MockChainlink",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.MockChainlink>;
+    deployContract(
+      name: "MockERC20",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.MockERC20>;
+    deployContract(
+      name: "CXBToken",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.CXBToken>;
 
     // default types
     getContractFactory(

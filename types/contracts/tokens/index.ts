@@ -2,6 +2,3 @@
 /* tslint:disable */
 /* eslint-disable */
 export type { CXBToken } from "./CXBToken";
-export type { Freezable } from "./Freezable";
-export type { IFreezable } from "./IFreezable";
-export type { TestToken } from "./TestToken";

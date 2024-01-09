@@ -1,11 +1,15 @@
-import { HardhatEthersSigner } from '@nomicfoundation/hardhat-ethers/signers'
 import { expect } from 'chai'
-import { Contract } from 'ethers'
-import { ethers, viem } from 'hardhat'
+import { ethers } from 'hardhat'
 import { zeroAddress } from 'viem'
+import { loadFixture } from '@nomicfoundation/hardhat-network-helpers'
 
+const encode = (signature) => {
+  return ethers.FunctionFragment.from(signature).selector
+}
+const ETHER_PRICE = 2000000000
 const START_BONUS = 20
 const NEW_BONUS = 40
+const E1 = ethers.parseEther('1')
 const E100 = ethers.parseEther('100')
 const E200 = ethers.parseEther('200')
 const E240 = ethers.parseEther('240')
@@ -23,218 +27,92 @@ const getClientAccount = async () => {
 }
 
 describe('PresaleManager', function () {
-  let token: Contract
-  let manager: Contract
-  let testToken: Contract
-  let owner: HardhatEthersSigner
-  let client: HardhatEthersSigner
-  let managerAddress
-  let tokenAddress
-  let testTokenAddress
-  beforeEach(async () => {
-    owner = await getOwnerAccount()
-    client = await getClientAccount()
-    token = await ethers.deployContract(
+  async function fixture() {
+    const [owner, client, referral] = await ethers.getSigners()
+    const token = await ethers.deployContract(
       'CXBToken',
       [owner.address, ethers.parseEther('10000')],
       owner
     )
-    manager = await ethers.deployContract(
-      'PresaleManager',
-      [owner.address, zeroAddress, START_BONUS],
+    const tokenAddress = await token.getAddress()
+
+    const mock = await ethers.deployContract(
+      'MockERC20',
+      [ethers.parseEther('10000')],
       owner
     )
-    testToken = await ethers.deployContract('TestToken', [owner.address], owner)
-    tokenAddress = await token.getAddress()
-    managerAddress = await manager.getAddress()
-    testTokenAddress = await testToken.getAddress()
+    const mockAddress = await mock.getAddress()
+    await mock.transfer(client, E1000)
+    const manager = await ethers.deployContract(
+      'PresaleManager',
+      [owner.address, [tokenAddress]],
+      owner
+    )
+    const managerAddress = await manager.getAddress()
+    await manager.grantRole(0, owner.address, 0)
+    await token.setAuthority(managerAddress)
+    const chainlink = await ethers.deployContract(
+      'MockChainlink',
+      [ETHER_PRICE],
+      owner
+    )
+    const chainlinkAddress = await chainlink.getAddress()
+    const purchase = await ethers.deployContract(
+      'CXBTokenPurchase',
+      [tokenAddress, chainlinkAddress, 1, START_BONUS, managerAddress],
+      { value: E100 }
+    )
+    const purchaseAddress = await purchase.getAddress()
+    await manager.connect(owner).addWorker(purchaseAddress)
+    await purchase.setRate(mockAddress, E1)
+    const funcs = [
+      'withdraw(address,address)',
+      'withdraw(address)',
+      'clean(address,address)',
+    ].map(encode)
+    await manager.setTargetFunctionRole(purchaseAddress, funcs, 0)
+    return {
+      owner,
+      client,
+      token,
+      manager,
+      purchase,
+      managerAddress,
+      tokenAddress,
+      purchaseAddress,
+      chainlink,
+      chainlinkAddress,
+      mock,
+      mockAddress,
+      referral,
+    }
+  }
+
+  beforeEach(async function () {
+    Object.assign(this, await loadFixture(fixture))
   })
 
-  it('Should not pause when caller is not an owner', async function () {
-    await expect(
-      manager.connect(client).getFunction('pause')()
-    ).to.be.revertedWithCustomError(manager, 'OwnableUnauthorizedAccount')
-  })
-
-  it('Should not change address when not paused', async function () {
-    expect(await manager.token()).to.equal(zeroAddress)
-    await expect(
-      manager.setToken(tokenAddress)
-    ).to.be.revertedWithCustomError(manager, 'ExpectedPause')
-  })
-
-  it('Should not change address when not an owner called', async function () {
-    expect(await manager.token()).to.equal(zeroAddress)
-    await manager.pause()
-    await expect(
-      manager.connect(client).getFunction('setToken')(tokenAddress)
-    ).to.be.revertedWithCustomError(manager, 'OwnableUnauthorizedAccount')
-  })
-
-  it('Should change address to the another only when paused', async function () {
-    expect(await manager.token()).to.equal(zeroAddress)
-    await manager.pause()
-    await expect(manager.setToken(tokenAddress))
-    await manager.unpause()
-    expect(await manager.token()).to.equal(tokenAddress)
-  })
-
-  it('Should correctly set initial bonus', async function () {
-    expect(await manager.bonus()).to.equal(START_BONUS)
-  })
-
-  it('Should not change bonus when not an owner called', async function () {
-    expect(await manager.bonus()).to.equal(START_BONUS)
-    await manager.pause()
-    await expect(
-      manager.connect(client).getFunction('setBonus')(NEW_BONUS)
-    ).to.be.revertedWithCustomError(manager, 'OwnableUnauthorizedAccount')
-  })
-
-  it('Should transfer authority only when paused', async function () {
-    expect(await token.setAuthority(managerAddress));
-    expect(await token.authority()).to.equal(managerAddress)
+  it('Should transfer authority only with correct rights', async function () {
+    expect(await this.token.authority()).to.equal(this.managerAddress);
     const newManager = await ethers.deployContract(
       'PresaleManager',
-      [owner.address, tokenAddress, START_BONUS],
-      owner
+      [this.owner.address, [this.tokenAddress]],
+      this.owner
     )
-    const newManagerAddress = await newManager.getAddress() 
-    // cannot transfer authority when another address defined
+    const newManagerAddress = await newManager.getAddress()
+    // cannot transfer authority from the different address
     await expect(
-      token.setAuthority(newManagerAddress)
-    ).to.be.revertedWithCustomError(token, 'AccessManagedUnauthorized')
-    // only when paused
-    await expect(
-      manager.transferAuthority(newManagerAddress)
-    ).to.be.revertedWithCustomError(manager, 'ExpectedPause')
-    await manager.pause()
+      this.token.connect(this.client).setAuthority(newManagerAddress)
+    ).to.be.revertedWithCustomError(this.token, 'AccessManagedUnauthorized')
     // token for the authority should be defined
-    await expect(manager.transferAuthority(newManagerAddress)).to.be.revertedWithCustomError(manager, 'EmptyToken')
-    await manager.setToken(tokenAddress);
-    expect(await manager.token()).to.equal(tokenAddress)
-    await manager.transferAuthority(newManagerAddress)
-    await manager.unpause()
-    expect(await token.authority()).to.equal(newManagerAddress)
-  })
-
-  it('Should change bonus to  another one only when paused', async function () {
-    await expect(manager.setBonus(NEW_BONUS)).to.be.revertedWithCustomError(
-      manager,
-      'ExpectedPause'
-    )
-    await manager.pause()
-    await expect(manager.setBonus(NEW_BONUS))
-    await manager.unpause()
-    expect(await manager.bonus()).to.equal(NEW_BONUS)
-  })
-
-  it('Should not to set rate without rights', async function () {
-    expect(await manager.rate(testTokenAddress)).to.equal(0)
-    await manager.pause()
     await expect(
-      manager.connect(client).getFunction('setRate')(testTokenAddress, 10000)
-    ).to.be.revertedWithCustomError(manager, 'OwnableUnauthorizedAccount')
+      this.manager.transferAuthority(zeroAddress)
+    ).to.be.revertedWithCustomError(this.manager, 'EmptyAuthority')
+    // await this.manager.addWorker(this.tokenAddress)
+    expect(await this.manager.haveWorker(this.tokenAddress)).to.be.true
+    await this.manager.transferAuthority(newManagerAddress)
+    expect(await this.token.authority()).to.equal(newManagerAddress) 
+    expect(await newManager.haveWorker(this.tokenAddress)).to.be.true 
   })
-
-  it('Should process errors during set rate', async function () {
-    await manager.pause()
-    await expect(manager.setRate(zeroAddress, 1)).to.be.revertedWithCustomError(
-      manager,
-      'EmptyCurrency'
-    )
-    await expect(
-      manager.setRate(testTokenAddress, 0)
-    ).to.be.revertedWithCustomError(manager, 'EmptyRate')
-    await expect(
-      manager.setRate(testTokenAddress, '20000000000000000000000')
-    ).to.be.revertedWithCustomError(manager, 'EmptyToken')
-    await expect(manager.setToken(tokenAddress))
-    await expect(
-      manager.setRate(testTokenAddress, '20000000000000000000000')
-    ).to.be.revertedWithCustomError(manager, 'TooBigRate')
-  })
-
-  it('Should set rate to another one only when paused', async function () {
-    const newRate = ethers.parseEther('1.2')
-    expect(await manager.rate(testTokenAddress)).to.equal(0)
-    await expect(
-      manager.setRate(testTokenAddress, ethers.parseEther('1.2'))
-    ).to.be.revertedWithCustomError(manager, 'ExpectedPause')
-    await manager.pause()
-    await expect(manager.setToken(tokenAddress))
-    await expect(manager.setRate(testTokenAddress, newRate))
-    await manager.unpause()
-    expect(await manager.rate(testTokenAddress)).to.equal(newRate)
-  })
-  it('Should not allow to buy tokens if manager have no free tokens', async function () {
-    await manager.pause()
-    await expect(manager.setToken(tokenAddress))
-    await expect(manager.setRate(testTokenAddress, ethers.parseEther('2')))
-    await manager.unpause()
-    expect(await token.balanceOf(managerAddress)).to.equal(0)
-    await testToken.mint(client, E1000)
-    expect(await testToken.balanceOf(client)).to.equal(E1000)
-
-    await testToken.connect(client).getFunction('approve')(managerAddress, E100)
-    expect(
-      await testToken.allowance(client.address, managerAddress)
-    ).to.be.equal(E100)
-    await expect(
-      manager.connect(client).getFunction('buy')(
-        testTokenAddress,
-        ethers.parseEther('100')
-      )
-    ).to.be.revertedWithCustomError(manager, 'UnsufficientManagerBalance')
-  })
-
-  it('Should not allow to buy tokens if client have no money', async function () {
-    await manager.pause()
-    await expect(manager.setToken(tokenAddress))
-    await expect(manager.setRate(testTokenAddress, ethers.parseEther('2')))
-    await manager.unpause()
-    expect(await testToken.balanceOf(client)).to.equal(0)
-    await testToken.connect(client).getFunction('approve')(managerAddress, E100)
-    expect(
-      await testToken.allowance(client.address, managerAddress)
-    ).to.be.equal(E100)
-    await expect(
-      manager.connect(client).getFunction('buy')(
-        testTokenAddress,
-        ethers.parseEther('100')
-      )
-    ).to.be.revertedWithCustomError(manager, 'UnsufficientBalance')
-  })
-
-  it('Should buy tokens', async function () {
-    await manager.pause()
-    await expect(manager.setToken(tokenAddress))
-    await expect(manager.setRate(testTokenAddress, ethers.parseEther('2')))
-    await manager.unpause()
-    await token.transfer(managerAddress, E1000)
-    await testToken.transfer(client, E1000)
-    expect(await token.balanceOf(managerAddress)).to.equal(E1000)
-    expect(await testToken.balanceOf(client)).to.equal(E1000)
-    await testToken.connect(client).getFunction('approve')(managerAddress, E100)
-    expect(
-      await testToken.allowance(client.address, managerAddress)
-    ).to.be.equal(E100)
-    await manager.pause()
-    await manager.setBonus(0)
-    await manager.unpause()
-    expect(await manager.getResultAmount(testTokenAddress, E100)).to.be.equal(
-      E200
-    )
-    await manager.pause()
-    await manager.setBonus(20)
-    await manager.unpause()
-    expect(await manager.getResultAmount(testTokenAddress, E100)).to.be.equal(
-      E240
-    )
-    expect(
-      await manager.connect(client).getFunction('buy')(testTokenAddress, E100)
-    )
-    expect(await token.balanceOf(managerAddress)).to.equal(E760)
-    expect(await token.balanceOf(client.address)).to.equal(E240)
-  })
+ 
 })

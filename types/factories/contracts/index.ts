@@ -2,5 +2,5 @@
 /* tslint:disable */
 /* eslint-disable */
 export * as management from "./management";
+export * as mocks from "./mocks";
 export * as tokens from "./tokens";
-export * as utils from "./utils";

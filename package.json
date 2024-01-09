@@ -4,16 +4,17 @@
   "author": {
     "name": "Ilya A. Shlyakhovoy"
   },
-  "private": false,
+  "private": true,
   "repository": {
     "type": "git",
     "url": "https://github.com/CnB-barter-bank/cxbt"
   },
   "devDependencies": {
     "@alch/alchemy-web3": "^1.4.7",
+    "@bgrusnak/solidity-icoset": "^0.6.1",
     "@nomicfoundation/hardhat-chai-matchers": "^2.0.2",
     "@nomicfoundation/hardhat-ethers": "^3.0.5",
-    "@nomicfoundation/hardhat-network-helpers": "^1.0.0",
+    "@nomicfoundation/hardhat-network-helpers": "^1.0.10",
     "@nomicfoundation/hardhat-toolbox": "^4.0.0",
     "@nomicfoundation/hardhat-toolbox-viem": "^2.0.0",
     "@nomicfoundation/hardhat-verify": "^2.0.0",
@@ -33,6 +34,7 @@
     "cross-env": "^7.0.3",
     "eth-gas-reporter": "^0.2.27",
     "ethereum-waffle": "^4.0.10",
+    "hardhat-contract-sizer": "^2.10.0",
     "hardhat-deploy-ethers": "^0.4.1",
     "prettier": "^2.7.1",
     "rimraf": "^5.0.5",
@@ -63,7 +65,6 @@
     "deploy:mainnet:only": "npx hardhat deploy  --network mainnet --tags ",
     "deploy:avalanche:only": "npx hardhat deploy  --network avalanche --tags ",
     "deploy:polygon:only": "npx hardhat deploy  --network polygon-mainnet --tags ",
-    "verify:sepolia:only": "npx hardhat verify --network sepolia",
     "verify:sepolia": "npx hardhat verify --network sepolia",
     "verify:bsc": "npx hardhat verify  --network bsc",
     "verify:mainnet": "npx hardhat verify  --network mainnet",
@@ -80,6 +81,7 @@
     "nonce": "npx hardhat nonce --address "
   },
   "dependencies": {
+    "@chainlink/contracts": "^0.8.0",
     "@ionic/vue": "^6.3.4",
     "@ionic/vue-router": "^6.3.4",
     "@kolirt/vue-web3-auth": "^2.0.1",

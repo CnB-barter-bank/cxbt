@@ -1,4 +1,4 @@
-import { DeployFunction } from 'hardhat-deploy/types'
+import { Address, DeployFunction } from 'hardhat-deploy/types'
 import { HardhatRuntimeEnvironment } from 'hardhat/types'
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
@@ -14,128 +14,83 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     getExtendedArtifact,
   } = hre.deployments
 
+  const workers: Address[] = []
+
   const tokenData = await getOrNull('CXBToken')
   if (!tokenData) {
     console.log('You need to deploy token first')
     return
   }
-/*   console.log('tokenData', tokenData.address)
+  /*   console.log('tokenData', tokenData.address)
   const token = await hre.ethers.getContractAt("CXBToken", tokenData.address)
 
   const chainId = await hre.getChainId()
   console.log('chainid', chainId)
   console.log('token', tokenData.address)
  */
- const managerDeploy = await deploy('PresaleManager', {
+  workers.push(tokenData.address)
+
+  const purchaseData = await getOrNull('CXBTokenPurchase')
+  if (purchaseData) {
+    workers.push(purchaseData.address)
+  }
+
+  const oldManagerData = await getOrNull('PresaleManager')
+
+  const signers = await hre.ethers.getSigners()
+  const signer = signers.find(({ address }) => address == useDeployer)
+
+  const token = await hre.ethers.getContractAt(
+    'CXBToken',
+    tokenData.address,
+    signer
+  ) 
+
+  const managerDeploy = await deploy('PresaleManager', {
     from: useDeployer,
-    args: [useDeployer, tokenData.address, 20],
+    args: [useDeployer, workers],
     log: true,
     // proxy: true,
     skipIfAlreadyDeployed: true,
     deterministicDeployment: true,
-  }) 
-
+  })
   console.log(`PresaleManager contract: `, managerDeploy.address)
- 
-/*   const oldAuthority = await token.authority();
-  console.log('old authority', oldAuthority)
-  if (managerDeploy.address == oldAuthority) {
-    console.log('Manager was not changed')
-    return
-  }
-  const manager =  await hre.ethers.getContractAt("PresaleManager", managerDeploy.address);
 
-  console.log('deployer', deployer)
-  console.log(
-    'manager pause was', await manager.paused()
-  )
-  await manager.getFunction('pause')()
-  console.log(
-    'manager pause now', await manager.paused()
-  )  */
-/*   let trx
-
-  trx = await manager.pause()
- */  // trx = await manager.updateAuthority(token.address, manager.address)
-/* 
- await execute(
-  'PresaleManager',
-  { from: deployer, log: true },
-  'pause'
-)
-
-  // await trx.wait()
-  console.log(
-    'manager pause now',
-    await read('PresaleManager', { from: deployer, log: true }, 'paused')
-  )
- */
-  /* 
-  console.log('old authority', oldAuthority)
-  const oldAuthorityAmount = await read(
-    'CXBToken',
-    { from: deployer, log: true },
-    'balanceOf',
-    oldAuthority
-  )
-  console.log('old authority balance', oldAuthorityAmount)
-  const deployerAmount = await read(
-    'CXBToken',
-    { from: deployer, log: true },
-    'balanceOf',
-    deployer
-  )
-  console.log('deployer balance', deployerAmount)
-  let newAuthorityAmount = await read(
-    'CXBToken',
-    { from: deployer, log: true },
-    'balanceOf',
-    manager.address
-  )
-  console.log('new authority balance before', newAuthorityAmount)
-
-  const old = await (
-    await hre.ethers.getContractFactory('PresaleManager')
-  ).attach(oldAuthority)
-  //await hre.ethers.getContractAt("PresaleManager", oldAuthority);
-
-  let trx = await old.updateAuthority(token.address, manager.address)
-
-  await trx.wait() */
-
-  /* 
-   await execute(
-    'CXBToken',
-    { from: deployer, log: true },
-    'setAuthority',
-    manager.address
-  )
-  await execute(
-    'CXBToken',
-    { from: deployer, log: true },
-    'transfer',
-    manager.address,
-    deployerAmount
-  )
-  await execute(
-    'CXBToken',
-    { from: deployer, log: true },
-    'transferFrom',
-    oldAuthority,
-    manager.address,
-    oldAuthorityAmount
-  ) 
-   newAuthorityAmount = await read(
-    'CXBToken',
-    { from: deployer, log: true },
-    'balanceOf',
-    manager.address
-  )
-  console.log('new authority balance after', newAuthorityAmount)  */
-/*   console.log(
-    'Changed authority to',
-    await read('CXBToken', { from: deployer, log: true }, 'authority')
-  ) */
+  if (oldManagerData && oldManagerData.address !==managerDeploy.address) {
+    const oldManager = await hre.ethers.getContractAt(
+      'PresaleManager',
+      oldManagerData.address,
+      signer
+    )
+    await oldManager
+      .transferAuthority(managerDeploy.address)
+      .then(async (tx) => await tx.wait())
+      console.log('Old manager data is transferred')
+    }
+   if ((await token.authority()) == useDeployer) {
+    await token
+      .setAuthority(managerDeploy.address)
+      .then(async (tx) => await tx.wait())
+      console.log('Token authority is assigned')
+    }else {
+      console.log('Token authority is ', await token.authority())
+    }
+     
+  if (purchaseData) {
+    const purchase = await hre.ethers.getContractAt(
+      'CXBTokenPurchase',
+      purchaseData.address,
+      signer
+    )
+    if ((await purchase.authority()) == useDeployer) {
+      await purchase
+        .setAuthority(managerDeploy.address)
+        .then(async (tx) => await tx.wait())
+        console.log('Purchase authority is assigned')
+      } else {
+        console.log('Purchase authority is ', await purchase.authority())
+      }
+  } else {console.log('Purchsse is not found')}  
 }
 func.id = 'deploy_PresaleManager' // id required to prevent reexecution
 func.tags = ['Manager']

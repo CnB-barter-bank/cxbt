@@ -2,6 +2,3 @@
 /* tslint:disable */
 /* eslint-disable */
 export { CXBToken__factory } from "./CXBToken__factory";
-export { Freezable__factory } from "./Freezable__factory";
-export { IFreezable__factory } from "./IFreezable__factory";
-export { TestToken__factory } from "./TestToken__factory";

@@ -1,21 +1,22 @@
 import { Chain } from '@kolirt/vue-web3-auth'
 
-import {address as sepoliaToken} from '../../deployments/sepolia/CXBToken.json'
-import {address as sepoliaManager} from '../../deployments/sepolia/PresaleManager.json'
-import {address as avalancheToken} from '../../deployments/avalanche/CXBToken.json'
-import {address as avalancheManager} from '../../deployments/avalanche/PresaleManager.json'
-import {address as bscToken} from '../../deployments/bsc/CXBToken.json'
-import {address as bscManager} from '../../deployments/bsc/PresaleManager.json'
-import {address as mainnetToken} from '../../deployments/mainnet/CXBToken.json'
-// import {address as mainnetManager} from '../../deployments/mainnet/PresaleManager.json'
-import {address as polygonMainnetToken} from '../../deployments/polygon-mainnet/CXBToken.json'
-import {address as polygonMainnetManager} from '../../deployments/polygon-mainnet/PresaleManager.json'
+import { address as sepoliaToken } from '../../deployments/sepolia/CXBToken.json'
+// import { address as sepoliaPurchase } from '../../deployments/sepolia/CXBTokenPurchase.json'
+import { address as avalancheToken } from '../../deployments/avalanche/CXBToken.json'
+// import { address as avalanchePurchase } from '../../deployments/avalanche/CXBTokenPurchase.json'
+import { address as bscToken } from '../../deployments/bsc/CXBToken.json'
+// import { address as bscPurchase } from '../../deployments/bsc/CXBTokenPurchase.json'
+import { address as mainnetToken } from '../../deployments/mainnet/CXBToken.json'
+// import {address as mainnetPurchase} from '../../deployments/mainnet/CXBTokenPurchase.json'
+import { address as polygonMainnetToken } from '../../deployments/polygon-mainnet/CXBToken.json'
+// import { address as polygonMainnetPurchase } from '../../deployments/polygon-mainnet/CXBTokenPurchase.json'
+import { sha256, toUtf8Bytes } from 'ethers'
 
 export type TokenDataType = {
   name: string
   address: string
   rate: number
-  currency: string, 
+  currency: string
 }
 
 export type EthAddressType = `0x${string}`
@@ -61,7 +62,8 @@ export const tokens = [
   {
     chainId: 1,
     coin: mainnetToken,
-    // manager: mainnetManager,
+    //  purchase: mainnetPurchase,
+    chainkink:'0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419',
     tokens: [
       {
         name: 'EURS',
@@ -133,8 +135,9 @@ export const tokens = [
   },
   {
     chainId: 11155111,
-    coin: sepoliaToken, 
-    manager: sepoliaManager,
+    coin: sepoliaToken,
+    chainlink: '0x694AA1769357215DE4FAC081bf1f309aDC325306',
+    //  purchase: sepoliaPurchase,
     tokens: [
       {
         name: 'DAI',
@@ -153,7 +156,8 @@ export const tokens = [
   {
     chainId: 43114,
     coin: avalancheToken,
-    manager:avalancheManager,
+    chainlink:  '0x0A77230d17318075983913bC2145DB16C7366156',
+    //  purchase: avalanchePurchase,
     tokens: [
       {
         name: 'USDT',
@@ -190,7 +194,8 @@ export const tokens = [
   {
     chainId: 137,
     coin: polygonMainnetToken,
-    manager: polygonMainnetManager,
+    chainlink: '0xAB594600376Ec9fD91F8e885dADF0CE036862dE0',
+    //  purchase: polygonMainnetPurchase,
     tokens: [
       {
         name: 'EURS',
@@ -227,7 +232,8 @@ export const tokens = [
   {
     chainId: 56,
     coin: bscToken,
-    manager: bscManager,
+    chainlink: '0x0567F2323251f0Aab15c8dFb1967E4e8A7D42aeE',
+    //  purchase: bscPurchase,
     tokens: [
       {
         name: 'AGEUR',
@@ -268,3 +274,15 @@ export const tokens = [
     ],
   },
 ]
+
+export const encodeFunctionCall = (func: string): string => {
+  return sha256(toUtf8Bytes(func)).substring(0, 10)
+}
+
+export const abiCalls = {
+  CXBTokenPurchase: {
+    'withdraw(address)': encodeFunctionCall('withdraw(address)'),
+    'withdraw(address,address)': encodeFunctionCall('withdraw(address,address)'),
+    'clean(address,address)': encodeFunctionCall('clean(address,address)'),
+  },
+}
