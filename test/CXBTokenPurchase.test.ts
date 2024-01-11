@@ -1,12 +1,13 @@
 const { loadFixture } = require('@nomicfoundation/hardhat-network-helpers')
 import { expect } from 'chai'
 import { ethers } from 'hardhat'
+import { zeroAddress } from 'viem'
 
 const encode = (signature) => {
   return ethers.FunctionFragment.from(signature).selector
 }
 
-const ETHER_PRICE = 2000000000
+const ETHER_PRICE = 200000000
 const START_BONUS = 20
 const NEW_BONUS = 40
 const E1 = ethers.parseEther('1')
@@ -41,7 +42,7 @@ describe('CXBTokenPurchase', function () {
       owner
     )
     const managerAddress = await manager.getAddress()
-    await manager.grantRole(0, owner.address, 0) 
+    await manager.grantRole(0, owner.address, 0)
     await token.setAuthority(managerAddress)
     const chainlink = await ethers.deployContract(
       'MockChainlink',
@@ -51,17 +52,18 @@ describe('CXBTokenPurchase', function () {
     const chainlinkAddress = await chainlink.getAddress()
     const purchase = await ethers.deployContract(
       'CXBTokenPurchase',
-      [tokenAddress, chainlinkAddress, 1, START_BONUS, managerAddress], 
-      {value: E100}
+      [tokenAddress, chainlinkAddress, 1, START_BONUS, managerAddress],
+      { value: E100 }
     )
     const purchaseAddress = await purchase.getAddress()
+    await token.transfer(purchaseAddress, E1000)
     await manager.connect(owner).addWorker(purchaseAddress)
     await purchase.setRate(mockAddress, E1)
     const funcs = [
       'withdraw(address,address)',
       'withdraw(address)',
-      'clean(address,address)'
-    ].map(encode) 
+      'clean(address,address)',
+    ].map(encode)
     await manager.setTargetFunctionRole(purchaseAddress, funcs, 0)
     return {
       owner,
@@ -84,33 +86,53 @@ describe('CXBTokenPurchase', function () {
     Object.assign(this, await loadFixture(fixture))
   })
 
-  it('Cannot withdraw by other person', async function () { 
+  it('Cannot withdraw by other person', async function () {
     await expect(
       this.purchase.connect(this.client).withdraw(this.client.address)
     ).to.be.revertedWithCustomError(this.purchase, 'AccessManagedUnauthorized')
   })
 
-  it("Withdraw is successful by admin", async function () {
-    expect(await ethers.provider.getBalance(this.purchaseAddress)).to.equal(E100);
-     const old = await ethers.provider.getBalance(this.referral.address);
-    expect( await
-      this.purchase.withdraw(this.referral.address)
+  it('Withdraw is successful by admin', async function () {
+    expect(await ethers.provider.getBalance(this.purchaseAddress)).to.equal(
+      E100
     )
-    expect(await ethers.provider.getBalance(this.purchaseAddress)).to.equal(0);
-    expect(
-      await ethers.provider.getBalance(this.referral.address)
-  ).to.equal(E100 + old);  
+    const old = await ethers.provider.getBalance(this.referral.address)
+    expect(await this.purchase.withdraw(this.referral.address))
+    expect(await ethers.provider.getBalance(this.purchaseAddress)).to.equal(0)
+    expect(await ethers.provider.getBalance(this.referral.address)).to.equal(
+      E100 + old
+    )
   })
 
-  it("Cannot clean by other person", async function () {
+  it('Cannot clean by other person', async function () {
     await expect(
-      this.purchase.connect(this.client).clean(this.client.address, this.client.address)
+      this.purchase
+        .connect(this.client)
+        .clean(this.client.address, this.client.address)
     ).to.be.revertedWithCustomError(this.purchase, 'AccessManagedUnauthorized')
   })
 
-  it("Clean is successful by admin", async function () {
-    expect( await
-      this.purchase.clean(this.owner.address, this.referral.address)
+  it('Clean is successful by admin', async function () {
+    expect(await this.purchase.clean(this.owner.address, this.referral.address))
+  })
+
+  it('Purchase 1 ether  = 240 tokens', async function () {
+    expect(await this.token.balanceOf(this.purchaseAddress)).to.equal(E1000)
+    expect(await ethers.provider.getBalance(this.purchaseAddress)).to.equal(
+      E100
+    ) 
+    expect(await this.token.balanceOf(this.client.address)).to.equal(0)
+    expect(
+      await this.purchase
+        .connect(this.client)
+        .deposit(zeroAddress, { value: E1 })
     )
-  }) 
+    expect(await this.token.balanceOf(this.client.address)).to.equal(E240)
+    expect(await ethers.provider.getBalance(this.purchaseAddress)).to.equal(
+      ethers.parseEther('101')
+    )
+    expect(await this.token.balanceOf(this.purchaseAddress)).to.equal(
+      ethers.parseEther('760')
+    )
+  })
 })

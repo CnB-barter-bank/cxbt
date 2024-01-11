@@ -5,8 +5,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployer, mainDeployer } = await hre.getNamedAccounts()
   const useDeployer = process.env.DEPLOYER == 'master' ? mainDeployer : deployer
   const {
-    deploy,
-    deployIfDifferent,
+    deploy, 
     getOrNull,
     execute,
     read,
@@ -56,42 +55,53 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   })
   console.log(`PresaleManager contract: `, managerDeploy.address)
 
-  if (oldManagerData && oldManagerData.address !==managerDeploy.address) {
+const oldTokenAuthority = await token.authority();
+
+if (oldTokenAuthority == useDeployer) {
+  console.log("Token authority belongs to deployer, transferring")
+ await token.setAuthority(managerDeploy.address)
+} else if (oldTokenAuthority !=  managerDeploy.address) {
+  console.log("Need to move token authority from ", oldTokenAuthority)
+} else {
+  console.log("Token authority already belongs to manager")
+}
+
+let purchase
+
+if (purchaseData) {
+  purchase = await hre.ethers.getContractAt(
+    'CXBTokenPurchase',
+    purchaseData.address,
+    signer
+  );
+  const oldPurchaseAuthority = await purchase.authority();
+if (oldPurchaseAuthority == useDeployer) {
+  console.log("Purchase authority belongs to deployer, transferring")
+ await purchase.setAuthority(managerDeploy.address)
+} else if (oldPurchaseAuthority !=  managerDeploy.address) {
+  console.log("Need to move Purchase authority from ", oldPurchaseAuthority)
+} else {
+  console.log("Token authority already belongs to manager")
+}
+} else {
+  console.log('Purchase is not defined yet')
+}
+
+ 
+if (oldTokenAuthority !== useDeployer && oldTokenAuthority !== managerDeploy.address) {
+    console.log('Transfer authority from ', oldTokenAuthority)
     const oldManager = await hre.ethers.getContractAt(
       'PresaleManager',
-      oldManagerData.address,
+      oldTokenAuthority,
       signer
     )
+    console
     await oldManager
       .transferAuthority(managerDeploy.address)
       .then(async (tx) => await tx.wait())
       console.log('Old manager data is transferred')
-    }
-   if ((await token.authority()) == useDeployer) {
-    await token
-      .setAuthority(managerDeploy.address)
-      .then(async (tx) => await tx.wait())
-      console.log('Token authority is assigned')
-    }else {
-      console.log('Token authority is ', await token.authority())
-    }
-     
-  if (purchaseData) {
-    const purchase = await hre.ethers.getContractAt(
-      'CXBTokenPurchase',
-      purchaseData.address,
-      signer
-    )
-    if ((await purchase.authority()) == useDeployer) {
-      await purchase
-        .setAuthority(managerDeploy.address)
-        .then(async (tx) => await tx.wait())
-        console.log('Purchase authority is assigned')
-      } else {
-        console.log('Purchase authority is ', await purchase.authority())
-      }
-  } else {console.log('Purchsse is not found')}  
-}
+    } 
+} 
 func.id = 'deploy_PresaleManager' // id required to prevent reexecution
 func.tags = ['Manager']
 

@@ -111,6 +111,12 @@
                           :icon="logoEuro"
                           aria-hidden="true"
                         ></ion-icon>
+                        <ion-icon
+                          v-if="token.currency == 'main'"
+                          slot="start"
+                          :icon="logoBitcoin"
+                          aria-hidden="true"
+                        ></ion-icon>
                         <ion-button
                           @click="setMaxAmount"
                           fill="clear"
@@ -190,11 +196,12 @@
               </ion-card-header>
               <ion-card-content style="min-height: 200px; padding-top: 90px">
                 <p>
-                  Due to holidays, we are technically unable to do our token sale automatically.
-But you can contact  with us 24 hours  to write to us or to order a return call;
-Naturally, as always for all last years, with great attention and personal bonuses.<br />
-                  You can contact us using the
-                  following details:<br />
+                  Due to holidays, we are technically unable to do our token
+                  sale automatically. But you can contact with us 24 hours to
+                  write to us or to order a return call; Naturally, as always
+                  for all last years, with great attention and personal
+                  bonuses.<br />
+                  You can contact us using the following details:<br />
                   Email:
                   <a href="mailto:support@clearingandbarterhouse.eu"
                     >support@clearingandbarterhouse.eu</a
@@ -309,7 +316,7 @@ import {
   arrowDownCircleOutline,
   logoUsd,
   logoEuro,
-  cashOutline,
+  logoBitcoin,
   mic,
   mailUnread,
 } from 'ionicons/icons'
@@ -318,11 +325,15 @@ import {
   tokens as tokensByNetworks,
   EthAddressType,
   TokenDataType,
+  chainLinkABI,
+  div10bn,
+  mul10bn
 } from '../utils/blockchain'
-import { abi as managerABI } from '../../artifacts/contracts/management/PresaleManager.sol/PresaleManager.json'
+import { abi as purchaseABI } from '../../artifacts/contracts/management/CXBTokenPurchase.sol/CXBTokenPurchase.json'
 import { abi as tokenABI } from '../../artifacts/contracts/tokens/CXBToken.sol/CXBToken.json'
+import { ZeroAddress, ethers } from 'ethers'
 
-const disabled = ref(true)
+const disabled = ref(false)
 const name = ref('')
 const phone = ref('')
 const service = ref('call')
@@ -369,13 +380,13 @@ const contactMe = async () => {
     }
   )
   const toast = await toastController.create({
-      message: 'Thank you, we\'ll certainly get in contact with you',
-      duration: 1500,
-      position: 'top',
-      color: 'success',
-    })
+    message: "Thank you, we'll certainly get in contact with you",
+    duration: 1500,
+    position: 'top',
+    color: 'success',
+  })
 
-    await toast.present()
+  await toast.present()
 }
 
 const initialize = async (): Promise<any> => {
@@ -392,34 +403,60 @@ onMounted(() => {
 })
 
 const getMyBalance = async (token: EthAddressType) => {
-  const out = await fetchBalance({
+  return await fetchBalance({
     address: account.address!,
     token,
   })
-  return out
 }
 
-const computeGained = () => {
+const getNativeRate = async (): Promise<Number> => {
+  const decimals = Number(
+    await readContract({
+      address: token.value.address as EthAddressType,
+      abi: chainLinkABI,
+      functionName: 'decimals',
+      args: [],
+    })
+  )
+  const amount = (await readContract({
+    address: token.value.address as EthAddressType,
+    abi: chainLinkABI,
+    functionName: 'latestAnswer',
+    args: [],
+  })) as any as bigint
+  const shifted = div10bn(amount, decimals)
+  return shifted
+}
+
+const getNativeBalance = async () => {
+  return await fetchBalance({
+    address: account.address!,
+  })
+}
+
+const computeGained = async () => {
   if (token.value.rate == undefined) {
     gainedTokens.value = '0'
     bonusTokens.value = '0'
     return
   }
-  const val = Number(offeredTokens.value) * token.value.rate
+  const rate =
+    token.value.currency == 'main' ? await getNativeRate() : token.value.rate
+  const val = Number(offeredTokens.value) * Number(rate)
   gainedTokens.value = formatValue(val.toString())
   bonusTokens.value = formatValue((val * 0.2).toString())
 }
 
-const buyTokens = (ev: any) => {
+const buyTokens = async (ev: any) => {
   offeredTokens.value = formatValue(
     ev.target!.value.replace(/[^0-9\.]+/g, ''),
     false
   )
   purchcaseDisabled.value = !Number(offeredTokens.value)
-  computeGained()
+  await computeGained()
 }
 
-const takeTokens = (ev: any) => {
+const takeTokens = async (ev: any) => {
   gainedTokens.value = formatValue(
     ev.target!.value.replace(/[^0-9\.]+/g, ''),
     false
@@ -429,9 +466,12 @@ const takeTokens = (ev: any) => {
     bonusTokens.value = '0'
     return
   }
+  const rate =
+    token.value.currency == 'main' ? await getNativeRate() : token.value.rate
+
   bonusTokens.value = formatValue((Number(gainedTokens.value) * 0.2).toString())
   offeredTokens.value = formatValue(
-    (Number(gainedTokens.value) / token.value.rate).toString()
+    (Number(gainedTokens.value) / Number(rate)).toString()
   )
   purchcaseDisabled.value = !Number(offeredTokens.value)
 }
@@ -450,9 +490,12 @@ const populateBalances = async () => {
   coinToken = getCoin(chain.value.id)
   coinAmount.value = (await getMyBalance(coinToken)).formatted
   if (!!token.value.address) {
-    tokenAmount.value = formatValue(
-      (await getMyBalance(token.value.address as any)).formatted
-    )
+    tokenAmount.value =
+      token.value.currency == 'main'
+        ? formatValue((await getNativeBalance()).formatted)
+        : formatValue(
+            (await getMyBalance(token.value.address as any)).formatted
+          )
     computeGained()
   } else {
     tokenAmount.value = '0'
@@ -477,11 +520,18 @@ const getCoin = (chainId: number): EthAddressType => {
   if (!found) return '0x0'
   return found.coin! as EthAddressType
 }
-
+/* 
 const getManager = (chainId: number): EthAddressType => {
   const found = tokensByNetworks.find((item) => item.chainId == chainId)
   if (!found) return '0x0'
   return found.manager! as EthAddressType
+}
+ */
+
+const getPurchase = (chainId: number): EthAddressType => {
+  const found = tokensByNetworks.find((item) => item.chainId == chainId)
+  if (!found) return '0x0'
+  return found.purchase! as EthAddressType
 }
 
 const setMaxAmount = (ev: any) => {
@@ -514,11 +564,6 @@ const changeNetwork = async (chainId: number) => {
   }
 }
 
-const mul = (amount: string, decimals: number) => {
-  const [m, l] = amount.split('.', 2)
-  if (!l) return m + '0'.repeat(decimals)
-  return m + l + '0'.repeat(decimals - l.length)
-}
 
 const purchcase = async () => {
   try {
@@ -529,21 +574,62 @@ const purchcase = async () => {
       functionName: 'decimals',
       args: [],
     })
-    const fractions = mul(offeredTokens.value, Number(decimals))
-    const tokenData = await writeContract({
+    if (token.value.currency == 'main') {
+      const value = ethers.parseEther(offeredTokens.value)
+    /*   console.log(
+        decimals,
+        decimals,
+        'amount',
+        await readContract({
+          address: getPurchase(chain.value.id) as EthAddressType,
+          abi: purchaseABI,
+          functionName: 'calculateAmount',
+          args: [ZeroAddress, value],
+        })
+      )
+      console.log(
+        'address',
+        getPurchase(chain.value.id),
+        await readContract({
+          address: token.value.address as EthAddressType,
+          abi: erc20ABI,
+          functionName: 'balanceOf',
+          args: [getPurchase(chain.value.id) as EthAddressType],
+        })
+      ) */
+      await writeContract({
+        abi: purchaseABI,
+        address: getPurchase(chain.value.id) as EthAddressType,
+        functionName: 'deposit',
+        value,
+      }).then(async (tx) => await tx.wait())
+      return
+    }
+    const fractions = mul10bn(offeredTokens.value, Number(decimals))
+
+    console.log(
+        'fractions',
+        fractions,
+        'amount',
+        await readContract({
+          address: getPurchase(chain.value.id) as EthAddressType,
+          abi: purchaseABI,
+          functionName: 'calculateAmount',
+          args: [token.value.address, fractions],
+        })
+      )
+    await writeContract({
       abi: erc20ABI,
       address: token.value.address as EthAddressType,
       functionName: 'approve',
-      args: [getManager(chain.value.id), fractions],
-    })
-    await tokenData.wait()
-    const managerData = await writeContract({
-      abi: managerABI,
-      address: getManager(chain.value.id) as EthAddressType,
+      args: [getPurchase(chain.value.id), fractions],
+    }).then(async (tx) => await tx.wait())
+    await writeContract({
+      abi: purchaseABI,
+      address: getPurchase(chain.value.id) as EthAddressType,
       functionName: 'buy',
-      args: [token.value.address, fractions],
-    })
-    await managerData.wait()
+      args: [account.address!, token.value.address, fractions, ZeroAddress],
+    }).then(async (tx) => await tx.wait())
   } finally {
     purchcaseDisabled.value = false
   }

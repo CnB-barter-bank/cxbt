@@ -106,7 +106,7 @@ contract CXBTokenPurchase is Purchase, AccessManaged, Pausable {
     address payable _to,
     address newOwner
   ) external override restricted {
-    _clean(_to, newOwner);
+    _clean(_to, newOwner); 
   }
 
   function pause() external restricted {

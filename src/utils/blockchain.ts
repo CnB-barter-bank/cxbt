@@ -1,7 +1,7 @@
 import { Chain } from '@kolirt/vue-web3-auth'
 
 import { address as sepoliaToken } from '../../deployments/sepolia/CXBToken.json'
-// import { address as sepoliaPurchase } from '../../deployments/sepolia/CXBTokenPurchase.json'
+import { address as sepoliaPurchase } from '../../deployments/sepolia/CXBTokenPurchase.json'
 import { address as avalancheToken } from '../../deployments/avalanche/CXBToken.json'
 // import { address as avalanchePurchase } from '../../deployments/avalanche/CXBTokenPurchase.json'
 import { address as bscToken } from '../../deployments/bsc/CXBToken.json'
@@ -65,6 +65,12 @@ export const tokens = [
     //  purchase: mainnetPurchase,
     chainkink:'0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419',
     tokens: [
+      {
+        name: 'Ether',
+        address: '0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419',
+        rate: 1,
+        currency: 'main',
+      },
       {
         name: 'EURS',
         address: '0xdb25f211ab05b1c97d595516f45794528a807ad8',
@@ -137,8 +143,14 @@ export const tokens = [
     chainId: 11155111,
     coin: sepoliaToken,
     chainlink: '0x694AA1769357215DE4FAC081bf1f309aDC325306',
-    //  purchase: sepoliaPurchase,
+     purchase: sepoliaPurchase,
     tokens: [
+      {
+        name: 'Ether',
+        address: '0x694AA1769357215DE4FAC081bf1f309aDC325306',
+        rate: 1,
+        currency: 'main',
+      },
       {
         name: 'DAI',
         address: '0xe5118E47e061ab15Ca972D045b35193F673bcc36',
@@ -160,8 +172,14 @@ export const tokens = [
     //  purchase: avalanchePurchase,
     tokens: [
       {
+        name: 'Avax',
+        address: '0x0A77230d17318075983913bC2145DB16C7366156',
+        rate: 1,
+        currency: 'main',
+      },
+      {
         name: 'USDT',
-        address: '0x9702230a8ea53601f5cd2dc00fdbc13d4df4a8c7',
+        address: '0x0A77230d17318075983913bC2145DB16C7366156',
         rate: 1,
         currency: 'usd',
       },
@@ -197,6 +215,12 @@ export const tokens = [
     chainlink: '0xAB594600376Ec9fD91F8e885dADF0CE036862dE0',
     //  purchase: polygonMainnetPurchase,
     tokens: [
+      {
+        name: 'Matic',
+        address: '0xAB594600376Ec9fD91F8e885dADF0CE036862dE0',
+        rate: 1,
+        currency: 'main',
+      },
       {
         name: 'EURS',
         address: '0xdb25f211ab05b1c97d595516f45794528a807ad8',
@@ -235,6 +259,12 @@ export const tokens = [
     chainlink: '0x0567F2323251f0Aab15c8dFb1967E4e8A7D42aeE',
     //  purchase: bscPurchase,
     tokens: [
+      {
+        name: 'BNB',
+        address: '0x0567F2323251f0Aab15c8dFb1967E4e8A7D42aeE',
+        rate: 1,
+        currency: 'main',
+      },
       {
         name: 'AGEUR',
         address: '0x12f31b73d812c6bb0d735a218c086d44d5fe5f89',
@@ -285,4 +315,258 @@ export const abiCalls = {
     'withdraw(address,address)': encodeFunctionCall('withdraw(address,address)'),
     'clean(address,address)': encodeFunctionCall('clean(address,address)'),
   },
+}
+
+export const chainLinkABI = [
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "int256",
+        "name": "current",
+        "type": "int256"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "roundId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "updatedAt",
+        "type": "uint256"
+      }
+    ],
+    "name": "AnswerUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "roundId",
+        "type": "uint256"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "startedBy",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "startedAt",
+        "type": "uint256"
+      }
+    ],
+    "name": "NewRound",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "decimals",
+    "outputs": [
+      {
+        "internalType": "uint8",
+        "name": "",
+        "type": "uint8"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "description",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "roundId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getAnswer",
+    "outputs": [
+      {
+        "internalType": "int256",
+        "name": "",
+        "type": "int256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint80",
+        "name": "_roundId",
+        "type": "uint80"
+      }
+    ],
+    "name": "getRoundData",
+    "outputs": [
+      {
+        "internalType": "uint80",
+        "name": "roundId",
+        "type": "uint80"
+      },
+      {
+        "internalType": "int256",
+        "name": "answer",
+        "type": "int256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "startedAt",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "updatedAt",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint80",
+        "name": "answeredInRound",
+        "type": "uint80"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "roundId",
+        "type": "uint256"
+      }
+    ],
+    "name": "getTimestamp",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "latestAnswer",
+    "outputs": [
+      {
+        "internalType": "int256",
+        "name": "",
+        "type": "int256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "latestRound",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "latestRoundData",
+    "outputs": [
+      {
+        "internalType": "uint80",
+        "name": "roundId",
+        "type": "uint80"
+      },
+      {
+        "internalType": "int256",
+        "name": "answer",
+        "type": "int256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "startedAt",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "updatedAt",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint80",
+        "name": "answeredInRound",
+        "type": "uint80"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "latestTimestamp",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "version",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
+]
+
+export const div10bn = (num:bigint, decimals:number): number => {
+  const [str] = num.toString().split('n');
+  const b = Number(str.substring(0, str.length-Number(decimals)))
+  const a = Number(str.substring(str.length-Number(decimals)))
+  return Number(b+ (a > 0 ? '.'+ a : ''))
+}
+
+export const mul10bn = (amount: string|number, decimals: number):bigint => {
+  const [m, l] = String(amount).split('.', 2)
+  if (!l) return BigInt(m + '0'.repeat(Number(decimals)))
+  return BigInt(m + l + '0'.repeat(Number(decimals) - l.length))
 }

@@ -105,7 +105,7 @@ const config: HardhatUserConfig = {
   },
   etherscan: {
     apiKey: {
-      avalanche: vars.get('SNOWTRACE_API_KEY', ''),
+      avalanche: 'avascan',
       bsc: vars.get('BSCSCAN_API_KEY', ''),
       mainnet: vars.get('ETHERSCAN_API_KEY', ''),
       polygon: vars.get('POLYGONSCAN_API_KEY', ''),
