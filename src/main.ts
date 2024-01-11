@@ -33,10 +33,10 @@ const app = createApp(App).use(IonicVue, {
   projectId: '899c95d8d634fcecf3b9f7859173a69c',
   chains: [
       // Chains.bsc,
-      Chains.mainnet,
+      // Chains.mainnet,
       Chains.polygon,
       Chains.avalanche,
-      sepolia
+      // sepolia
   ]
 }))
 router.isReady().then(() => {

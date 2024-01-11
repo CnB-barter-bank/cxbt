@@ -27,6 +27,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const tokenData = await getOrNull('CXBToken')
   const purchaseData = await getOrNull('CXBTokenPurchase')
 
+  const managerData = await getOrNull('PresaleManager')
   if (!tokenData) {
     console.log('Token is not deployed')
   } else {
@@ -58,6 +59,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       purchaseData.address,
       signer
     )
+    console.log('Purchase authority is set? ', await purchase.authority() ==  managerData!.address)
     await Promise.all(
       chain!.tokens.map(async (token) =>
         console.log(token.address, await readRate(purchase, token))
@@ -91,7 +93,6 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     console.log('balance after', await hre.ethers.provider.getBalance(purchaseData.address)) */
   }
 
-  const managerData = await getOrNull('PresaleManager')
   if (!managerData) {
     console.log('Manager is not deployed')
   } else {

@@ -26,16 +26,21 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const chain = tokens.find(({ chainId }) => chainId == currentChainId)
 
   const assignRate = async (contract, token) => {
+    try {
     if (token.currency == 'main') return new Promise(() => {})
+    if ((await contract.rate(token.address)) > 0 ) {
+      console.log('Token', token.address, ' rate is already defined')
+      return new Promise(() => {})
+    }
     const tokenContract = new hre.ethers.Contract(
       token.address,
       erc20Abi,
       signer
     )
-    console.log(' Token contract connected')
+    console.log('Token contract connected',  token.address)
     const decimals = await tokenContract.decimals()
     const feeData = await hre.ethers.provider.getFeeData()
-    const gasPrice = (feeData.maxFeePerGas! * BigInt(130)) / BigInt(100)
+    const gasPrice = (feeData.maxFeePerGas! * BigInt(250)) / BigInt(100)
     console.log(
       'Assign to address',
       token.address,
@@ -44,11 +49,15 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       'gas price',
       gasPrice
     )
-    await contract
+     const done = await contract
       .setRate(token.address, mul10bn(token.rate, decimals), { gasPrice })
-      .then(async (tx) => await tx.wait())
-
-    console.log(`Token rate for ${token.address} is defined`)
+      .then(async (tx) => await tx.wait());
+      console.log(`Token rate for ${token.address} is defined`)
+      return done;
+    } catch(e) {
+      console.log(e);
+      return new Promise(() => {})
+    }
   }
 
   const purchaseDeploy = await deploy('CXBTokenPurchase', {
@@ -77,7 +86,9 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     console.log('Update authority')
   }
   console.log('Assign tokens')
-  await Promise.all(chain!.tokens.map((token) => assignRate(purchase, token)))
+   await Promise.allSettled(
+     chain!.tokens.map(async (token) => await assignRate(purchase, token))
+    )
 
   console.log(`Tokens assigned `)
 
