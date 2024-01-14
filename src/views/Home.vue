@@ -254,17 +254,13 @@
               </ion-card-content>
             </ion-card>
 
-
-            <ion-card
-              v-if="!disabled"
-              style="min-height: 300px"
-            > 
+            <ion-card v-if="!disabled" style="min-height: 300px">
               <ion-card-header>
                 <ion-card-title>Contact us</ion-card-title>
               </ion-card-header>
               <ion-card-content style="min-height: 200px; padding-top: 90px">
                 <p>
-                 You can contact us using the following details:<br />
+                  You can contact us using the following details:<br />
                   Email:
                   <a href="mailto:support@clearingandbarterhouse.eu"
                     >support@clearingandbarterhouse.eu</a
@@ -316,8 +312,6 @@
                 </ion-list>
               </ion-card-content>
             </ion-card>
-
-
           </ion-col>
         </ion-row>
       </ion-grid>
@@ -392,11 +386,24 @@ import {
   TokenDataType,
   chainLinkABI,
   div10bn,
-  mul10bn
+  mul10bn,
 } from '../utils/blockchain'
 import { abi as purchaseABI } from '../../artifacts/contracts/management/CXBTokenPurchase.sol/CXBTokenPurchase.json'
 import { abi as tokenABI } from '../../artifacts/contracts/tokens/CXBToken.sol/CXBToken.json'
 import { ZeroAddress, ethers } from 'ethers'
+
+
+const referrals = {
+  'deri':
+'0x438daf3401900ac642020dfe6aaf275ea7b9c96f2',
+'alexey':
+'0xEF8625FD2FEC9cC89deCf02bB1fE53D8145a9e9a3',
+'Neo_Moscow':'0x9e4ce2f452B14Ea10385bF4488058E251B65e13c',
+'deni_Pl': '0xBaE947eCb4B29c56D37BBbcC64ad0bcbd4dce13D',
+'Victor_paddelnik':'0x4de2afa6e10ddf6354885c42f63a594f417d8952'
+}
+
+
 
 const disabled = ref(false)
 const name = ref('')
@@ -454,7 +461,24 @@ const contactMe = async () => {
   await toast.present()
 }
 
+const referral = ref(ZeroAddress)
 const initialize = async (): Promise<any> => {
+  const searchParams = new URLSearchParams(window.location.search)
+  if (searchParams.has('ref')) {
+    if ((referrals as any)[searchParams.get('ref')!]) {
+      referral.value =(referrals as any)[searchParams.get('ref')!];
+    }
+
+    /*try {
+      const { data, status } = await axios.get(
+        'https://cxbt-services.miniapp.workers.dev/api/referral?name=' +
+          searchParams.get('ref')
+      )
+      if (status == 200) referral.value = data
+    } catch (e) {
+      console.log(e)
+    } */
+  }
   if (!account || !account.connected) {
     return setTimeout(initialize, 100)
   }
@@ -629,7 +653,6 @@ const changeNetwork = async (chainId: number) => {
   }
 }
 
-
 const purchcase = async () => {
   try {
     purchcaseDisabled.value = true
@@ -641,48 +664,18 @@ const purchcase = async () => {
     })
     if (token.value.currency == 'main') {
       const value = ethers.parseEther(offeredTokens.value)
-    /*   console.log(
-        decimals,
-        decimals,
-        'amount',
-        await readContract({
-          address: getPurchase(chain.value.id) as EthAddressType,
-          abi: purchaseABI,
-          functionName: 'calculateAmount',
-          args: [ZeroAddress, value],
-        })
-      )
-      console.log(
-        'address',
-        getPurchase(chain.value.id),
-        await readContract({
-          address: token.value.address as EthAddressType,
-          abi: erc20ABI,
-          functionName: 'balanceOf',
-          args: [getPurchase(chain.value.id) as EthAddressType],
-        })
-      ) */
+
       await writeContract({
         abi: purchaseABI,
         address: getPurchase(chain.value.id) as EthAddressType,
         functionName: 'deposit',
         value,
+        args: [referral.value],
       }).then(async (tx) => await tx.wait())
       return
     }
     const fractions = mul10bn(offeredTokens.value, Number(decimals))
 
-    console.log(
-        'fractions',
-        fractions,
-        'amount',
-        await readContract({
-          address: getPurchase(chain.value.id) as EthAddressType,
-          abi: purchaseABI,
-          functionName: 'calculateAmount',
-          args: [token.value.address, fractions],
-        })
-      )
     await writeContract({
       abi: erc20ABI,
       address: token.value.address as EthAddressType,
@@ -693,7 +686,7 @@ const purchcase = async () => {
       abi: purchaseABI,
       address: getPurchase(chain.value.id) as EthAddressType,
       functionName: 'buy',
-      args: [account.address!, token.value.address, fractions, ZeroAddress],
+      args: [account.address!, token.value.address, fractions, referral.value],
     }).then(async (tx) => await tx.wait())
   } finally {
     purchcaseDisabled.value = false

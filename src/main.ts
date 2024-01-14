@@ -25,6 +25,8 @@ import '@ionic/vue/css/display.css'
 import './theme/variables.css'
 import { sepolia } from './utils/blockchain'
 
+
+
 const pinia = createPinia()
 const app = createApp(App).use(IonicVue, {
   mode: 'ios',
@@ -36,7 +38,7 @@ const app = createApp(App).use(IonicVue, {
       // Chains.mainnet,
       Chains.polygon,
       Chains.avalanche,
-      // sepolia
+      sepolia
   ]
 }))
 router.isReady().then(() => {

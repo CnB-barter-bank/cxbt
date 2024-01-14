@@ -133,7 +133,7 @@ export const tokens = [
       },
     ],
   }, */
- /*  {
+  {
     chainId: 11155111,
     coin: sepoliaToken,
     chainlink: '0x694AA1769357215DE4FAC081bf1f309aDC325306',
@@ -158,7 +158,7 @@ export const tokens = [
         currency: 'usd',
       },
     ],
-  }, */
+  },
   {
     chainId: 43114,
     coin: avalancheToken,

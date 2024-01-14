@@ -91,6 +91,7 @@
     "@openzeppelin/upgrades": "^2.8.0",
     "@pancakeswap/pancake-swap-lib": "^0.0.4",
     "@pancakeswap/sdk": "^5.7.3",
+    "axios": "^1.6.5",
     "dotenv": "^16.3.1",
     "ethers": "^6.9.1",
     "ganache-cli": "^6.12.2",
