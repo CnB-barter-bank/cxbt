@@ -400,7 +400,8 @@ const referrals = {
 '0xEF8625FD2FEC9cC89deCf02bB1fE53D8145a9e9a3',
 'Neo_Moscow':'0x9e4ce2f452B14Ea10385bF4488058E251B65e13c',
 'deni_Pl': '0xBaE947eCb4B29c56D37BBbcC64ad0bcbd4dce13D',
-'Victor_paddelnik':'0x4de2afa6e10ddf6354885c42f63a594f417d8952'
+'Victor_paddelnik':'0x4de2afa6e10ddf6354885c42f63a594f417d8952',
+'al.ivliev':'0x8b675E255357Ba567082fa4A53aAf68Ba8D61791'
 }
 
 
