@@ -544,7 +544,6 @@ const referrals = {
 }
 
 const deployer = '0x9Cb1bd9c6968425F674688697882d6d09C7edF28'
-const currentChain = ref()
 const bountyTokens = ref('')
 const bountyAddress = ref('')
 const disabled = ref(false)

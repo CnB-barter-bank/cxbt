@@ -11,6 +11,8 @@ import { address as mainnetToken } from '../../deployments/mainnet/CXBToken.json
 import { address as polygonMainnetToken } from '../../deployments/polygon-mainnet/CXBToken.json'
 import { address as polygonMainnetPurchase } from '../../deployments/polygon-mainnet/CXBTokenPurchase.json'
 import { address as sepoliaBounty } from '../../deployments/sepolia/CXBTokenBounty.json'
+import { address as polygonBounty } from '../../deployments/polygon-mainnet/CXBTokenBounty.json'
+import { address as avalancheBounty } from '../../deployments/avalanche/CXBTokenBounty.json'
 
 import { sha256, toUtf8Bytes } from 'ethers'
 
@@ -61,7 +63,7 @@ export const sepolia: Chain = {
 // BSC  56
 
 export const tokens = [
- /*  {
+  /*  {
     chainId: 1,
     coin: mainnetToken,
     //  purchase: mainnetPurchase,
@@ -139,8 +141,8 @@ export const tokens = [
     chainId: 11155111,
     coin: sepoliaToken,
     chainlink: '0x694AA1769357215DE4FAC081bf1f309aDC325306',
-     purchase: sepoliaPurchase,
-     bounty: sepoliaBounty,
+    purchase: sepoliaPurchase,
+    bounty: sepoliaBounty,
     tokens: [
       {
         name: 'Ether',
@@ -165,8 +167,9 @@ export const tokens = [
   {
     chainId: 43114,
     coin: avalancheToken,
-    chainlink:  '0x0A77230d17318075983913bC2145DB16C7366156',
-     purchase: avalanchePurchase,
+    bounty: avalancheBounty,
+    chainlink: '0x0A77230d17318075983913bC2145DB16C7366156',
+    purchase: avalanchePurchase,
     tokens: [
       {
         name: 'Avax',
@@ -210,14 +213,15 @@ export const tokens = [
     chainId: 137,
     coin: polygonMainnetToken,
     chainlink: '0xAB594600376Ec9fD91F8e885dADF0CE036862dE0',
-     purchase: polygonMainnetPurchase,
+    purchase: polygonMainnetPurchase,
+    bounty: polygonBounty,
     tokens: [
       {
         name: 'Matic',
         address: '0xAB594600376Ec9fD91F8e885dADF0CE036862dE0',
         rate: 1,
         currency: 'main',
-      }, 
+      },
       {
         name: 'AGEUR',
         address: '0xe0b52e49357fd4daf2c15e02058dce6bc0057db4',
@@ -303,260 +307,262 @@ export const encodeFunctionCall = (func: string): string => {
 export const abiCalls = {
   CXBTokenPurchase: {
     'withdraw(address)': encodeFunctionCall('withdraw(address)'),
-    'withdraw(address,address)': encodeFunctionCall('withdraw(address,address)'),
+    'withdraw(address,address)': encodeFunctionCall(
+      'withdraw(address,address)'
+    ),
     'clean(address,address)': encodeFunctionCall('clean(address,address)'),
   },
 }
 
 export const chainLinkABI = [
   {
-    "anonymous": false,
-    "inputs": [
+    anonymous: false,
+    inputs: [
       {
-        "indexed": true,
-        "internalType": "int256",
-        "name": "current",
-        "type": "int256"
+        indexed: true,
+        internalType: 'int256',
+        name: 'current',
+        type: 'int256',
       },
       {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "roundId",
-        "type": "uint256"
+        indexed: true,
+        internalType: 'uint256',
+        name: 'roundId',
+        type: 'uint256',
       },
       {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "updatedAt",
-        "type": "uint256"
-      }
+        indexed: false,
+        internalType: 'uint256',
+        name: 'updatedAt',
+        type: 'uint256',
+      },
     ],
-    "name": "AnswerUpdated",
-    "type": "event"
+    name: 'AnswerUpdated',
+    type: 'event',
   },
   {
-    "anonymous": false,
-    "inputs": [
+    anonymous: false,
+    inputs: [
       {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "roundId",
-        "type": "uint256"
+        indexed: true,
+        internalType: 'uint256',
+        name: 'roundId',
+        type: 'uint256',
       },
       {
-        "indexed": true,
-        "internalType": "address",
-        "name": "startedBy",
-        "type": "address"
+        indexed: true,
+        internalType: 'address',
+        name: 'startedBy',
+        type: 'address',
       },
       {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "startedAt",
-        "type": "uint256"
-      }
+        indexed: false,
+        internalType: 'uint256',
+        name: 'startedAt',
+        type: 'uint256',
+      },
     ],
-    "name": "NewRound",
-    "type": "event"
+    name: 'NewRound',
+    type: 'event',
   },
   {
-    "inputs": [],
-    "name": "decimals",
-    "outputs": [
+    inputs: [],
+    name: 'decimals',
+    outputs: [
       {
-        "internalType": "uint8",
-        "name": "",
-        "type": "uint8"
-      }
+        internalType: 'uint8',
+        name: '',
+        type: 'uint8',
+      },
     ],
-    "stateMutability": "view",
-    "type": "function"
+    stateMutability: 'view',
+    type: 'function',
   },
   {
-    "inputs": [],
-    "name": "description",
-    "outputs": [
+    inputs: [],
+    name: 'description',
+    outputs: [
       {
-        "internalType": "string",
-        "name": "",
-        "type": "string"
-      }
+        internalType: 'string',
+        name: '',
+        type: 'string',
+      },
     ],
-    "stateMutability": "view",
-    "type": "function"
+    stateMutability: 'view',
+    type: 'function',
   },
   {
-    "inputs": [
+    inputs: [
       {
-        "internalType": "uint256",
-        "name": "roundId",
-        "type": "uint256"
-      }
+        internalType: 'uint256',
+        name: 'roundId',
+        type: 'uint256',
+      },
     ],
-    "name": "getAnswer",
-    "outputs": [
+    name: 'getAnswer',
+    outputs: [
       {
-        "internalType": "int256",
-        "name": "",
-        "type": "int256"
-      }
+        internalType: 'int256',
+        name: '',
+        type: 'int256',
+      },
     ],
-    "stateMutability": "view",
-    "type": "function"
+    stateMutability: 'view',
+    type: 'function',
   },
   {
-    "inputs": [
+    inputs: [
       {
-        "internalType": "uint80",
-        "name": "_roundId",
-        "type": "uint80"
-      }
+        internalType: 'uint80',
+        name: '_roundId',
+        type: 'uint80',
+      },
     ],
-    "name": "getRoundData",
-    "outputs": [
+    name: 'getRoundData',
+    outputs: [
       {
-        "internalType": "uint80",
-        "name": "roundId",
-        "type": "uint80"
+        internalType: 'uint80',
+        name: 'roundId',
+        type: 'uint80',
       },
       {
-        "internalType": "int256",
-        "name": "answer",
-        "type": "int256"
+        internalType: 'int256',
+        name: 'answer',
+        type: 'int256',
       },
       {
-        "internalType": "uint256",
-        "name": "startedAt",
-        "type": "uint256"
+        internalType: 'uint256',
+        name: 'startedAt',
+        type: 'uint256',
       },
       {
-        "internalType": "uint256",
-        "name": "updatedAt",
-        "type": "uint256"
+        internalType: 'uint256',
+        name: 'updatedAt',
+        type: 'uint256',
       },
       {
-        "internalType": "uint80",
-        "name": "answeredInRound",
-        "type": "uint80"
-      }
+        internalType: 'uint80',
+        name: 'answeredInRound',
+        type: 'uint80',
+      },
     ],
-    "stateMutability": "view",
-    "type": "function"
+    stateMutability: 'view',
+    type: 'function',
   },
   {
-    "inputs": [
+    inputs: [
       {
-        "internalType": "uint256",
-        "name": "roundId",
-        "type": "uint256"
-      }
+        internalType: 'uint256',
+        name: 'roundId',
+        type: 'uint256',
+      },
     ],
-    "name": "getTimestamp",
-    "outputs": [
+    name: 'getTimestamp',
+    outputs: [
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
     ],
-    "stateMutability": "view",
-    "type": "function"
+    stateMutability: 'view',
+    type: 'function',
   },
   {
-    "inputs": [],
-    "name": "latestAnswer",
-    "outputs": [
+    inputs: [],
+    name: 'latestAnswer',
+    outputs: [
       {
-        "internalType": "int256",
-        "name": "",
-        "type": "int256"
-      }
+        internalType: 'int256',
+        name: '',
+        type: 'int256',
+      },
     ],
-    "stateMutability": "view",
-    "type": "function"
+    stateMutability: 'view',
+    type: 'function',
   },
   {
-    "inputs": [],
-    "name": "latestRound",
-    "outputs": [
+    inputs: [],
+    name: 'latestRound',
+    outputs: [
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
     ],
-    "stateMutability": "view",
-    "type": "function"
+    stateMutability: 'view',
+    type: 'function',
   },
   {
-    "inputs": [],
-    "name": "latestRoundData",
-    "outputs": [
+    inputs: [],
+    name: 'latestRoundData',
+    outputs: [
       {
-        "internalType": "uint80",
-        "name": "roundId",
-        "type": "uint80"
+        internalType: 'uint80',
+        name: 'roundId',
+        type: 'uint80',
       },
       {
-        "internalType": "int256",
-        "name": "answer",
-        "type": "int256"
+        internalType: 'int256',
+        name: 'answer',
+        type: 'int256',
       },
       {
-        "internalType": "uint256",
-        "name": "startedAt",
-        "type": "uint256"
+        internalType: 'uint256',
+        name: 'startedAt',
+        type: 'uint256',
       },
       {
-        "internalType": "uint256",
-        "name": "updatedAt",
-        "type": "uint256"
+        internalType: 'uint256',
+        name: 'updatedAt',
+        type: 'uint256',
       },
       {
-        "internalType": "uint80",
-        "name": "answeredInRound",
-        "type": "uint80"
-      }
+        internalType: 'uint80',
+        name: 'answeredInRound',
+        type: 'uint80',
+      },
     ],
-    "stateMutability": "view",
-    "type": "function"
+    stateMutability: 'view',
+    type: 'function',
   },
   {
-    "inputs": [],
-    "name": "latestTimestamp",
-    "outputs": [
+    inputs: [],
+    name: 'latestTimestamp',
+    outputs: [
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
     ],
-    "stateMutability": "view",
-    "type": "function"
+    stateMutability: 'view',
+    type: 'function',
   },
   {
-    "inputs": [],
-    "name": "version",
-    "outputs": [
+    inputs: [],
+    name: 'version',
+    outputs: [
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
     ],
-    "stateMutability": "view",
-    "type": "function"
-  }
+    stateMutability: 'view',
+    type: 'function',
+  },
 ]
 
-export const div10bn = (num:bigint, decimals:number): number => {
-  const [str] = num.toString().split('n');
-  const b = Number(str.substring(0, str.length-Number(decimals)))
-  const a = Number(str.substring(str.length-Number(decimals)))
-  return Number(b+ (a > 0 ? '.'+ a : ''))
+export const div10bn = (num: bigint, decimals: number): number => {
+  const [str] = num.toString().split('n')
+  const b = Number(str.substring(0, str.length - Number(decimals)))
+  const a = Number(str.substring(str.length - Number(decimals)))
+  return Number(b + (a > 0 ? '.' + a : ''))
 }
 
-export const mul10bn = (amount: string|number, decimals: number):bigint => {
+export const mul10bn = (amount: string | number, decimals: number): bigint => {
   const [m, l] = String(amount).split('.', 2)
   if (!l) return BigInt(m + '0'.repeat(Number(decimals)))
   return BigInt(m + l + '0'.repeat(Number(decimals) - l.length))
