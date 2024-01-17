@@ -112,4 +112,12 @@ contract CXBTokenAirdrop is AccessManaged, ReentrancyGuard, Pausable {
         uint256 contractBalance = token.balanceOf(address(this));
         token.transfer(_to, contractBalance); 
     }
+
+  function pause() external restricted {
+    _pause();
+  }
+
+  function unpause() external restricted {
+    _unpause();
+  }
 }

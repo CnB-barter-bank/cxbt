@@ -18,9 +18,17 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.Airdrop__factory>;
     getContractFactory(
+      name: "Bounty",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.Bounty__factory>;
+    getContractFactory(
       name: "IAirdrop",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IAirdrop__factory>;
+    getContractFactory(
+      name: "IBounty",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IBounty__factory>;
     getContractFactory(
       name: "IPurchase",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -186,6 +194,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.CXBTokenAirdrop__factory>;
     getContractFactory(
+      name: "CXBTokenBounty",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.CXBTokenBounty__factory>;
+    getContractFactory(
       name: "CXBTokenPurchase",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.CXBTokenPurchase__factory>;
@@ -216,10 +228,20 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.Airdrop>;
     getContractAt(
+      name: "Bounty",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.Bounty>;
+    getContractAt(
       name: "IAirdrop",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.IAirdrop>;
+    getContractAt(
+      name: "IBounty",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IBounty>;
     getContractAt(
       name: "IPurchase",
       address: string | ethers.Addressable,
@@ -425,6 +447,11 @@ declare module "hardhat/types/runtime" {
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.CXBTokenAirdrop>;
+    getContractAt(
+      name: "CXBTokenBounty",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.CXBTokenBounty>;
     getContractAt(
       name: "CXBTokenPurchase",
       address: string | ethers.Addressable,
@@ -461,9 +488,17 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.Airdrop>;
     deployContract(
+      name: "Bounty",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.Bounty>;
+    deployContract(
       name: "IAirdrop",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IAirdrop>;
+    deployContract(
+      name: "IBounty",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IBounty>;
     deployContract(
       name: "IPurchase",
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -628,6 +663,10 @@ declare module "hardhat/types/runtime" {
       name: "CXBTokenAirdrop",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.CXBTokenAirdrop>;
+    deployContract(
+      name: "CXBTokenBounty",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.CXBTokenBounty>;
     deployContract(
       name: "CXBTokenPurchase",
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -659,10 +698,20 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.Airdrop>;
     deployContract(
+      name: "Bounty",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.Bounty>;
+    deployContract(
       name: "IAirdrop",
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IAirdrop>;
+    deployContract(
+      name: "IBounty",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IBounty>;
     deployContract(
       name: "IPurchase",
       args: any[],
@@ -868,6 +917,11 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.CXBTokenAirdrop>;
+    deployContract(
+      name: "CXBTokenBounty",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.CXBTokenBounty>;
     deployContract(
       name: "CXBTokenPurchase",
       args: any[],

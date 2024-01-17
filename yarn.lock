@@ -236,10 +236,10 @@
   dependencies:
     regenerator-runtime "^0.14.0"
 
-"@bgrusnak/solidity-icoset@^0.6.1":
-  version "0.6.1"
-  resolved "https://registry.yarnpkg.com/@bgrusnak/solidity-icoset/-/solidity-icoset-0.6.1.tgz#794eff4c8b096a6f0a53e529b614c2280b64650f"
-  integrity sha512-JWhP1Whwt3wAz4zh9Xgaxa1TZwvAKoZUYU8jm6mcA2xR831cojz5nA1LpVceokilB5BpNQIDXtLgfykCn7xP0w==
+"@bgrusnak/solidity-icoset@^0.6.5":
+  version "0.6.5"
+  resolved "https://registry.yarnpkg.com/@bgrusnak/solidity-icoset/-/solidity-icoset-0.6.5.tgz#50d294a457f51200b8e4424b27402ddfba657a18"
+  integrity sha512-tiDyhEtmDbTHO5XRCXvw1to9b3lK0OWiD9OgamOrqFiVaEoLd2gm7YL+WMq9vpDGCx4S7dTYWR6Ua1hlhZ1/LA==
   dependencies:
     "@chainlink/contracts" "^0.8.0"
     "@openzeppelin/contracts" "^5.0.1"

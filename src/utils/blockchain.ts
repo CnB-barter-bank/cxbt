@@ -10,6 +10,8 @@ import { address as mainnetToken } from '../../deployments/mainnet/CXBToken.json
 // import {address as mainnetPurchase} from '../../deployments/mainnet/CXBTokenPurchase.json'
 import { address as polygonMainnetToken } from '../../deployments/polygon-mainnet/CXBToken.json'
 import { address as polygonMainnetPurchase } from '../../deployments/polygon-mainnet/CXBTokenPurchase.json'
+import { address as sepoliaBounty } from '../../deployments/sepolia/CXBTokenBounty.json'
+
 import { sha256, toUtf8Bytes } from 'ethers'
 
 export type TokenDataType = {
@@ -138,6 +140,7 @@ export const tokens = [
     coin: sepoliaToken,
     chainlink: '0x694AA1769357215DE4FAC081bf1f309aDC325306',
      purchase: sepoliaPurchase,
+     bounty: sepoliaBounty,
     tokens: [
       {
         name: 'Ether',

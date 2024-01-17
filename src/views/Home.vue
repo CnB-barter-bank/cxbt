@@ -178,6 +178,145 @@
                 </ion-grid>
               </ion-card-content>
             </ion-card>
+
+            <ion-card
+              v-if="account.connected && !disabled && isBountyAgent"
+              style="min-height: 300px"
+              class="sizeMd"
+            >
+              <ion-card-header>
+                <ion-card-title>Bounty distribution</ion-card-title>
+              </ion-card-header>
+
+              <ion-card-content>
+                <ion-grid>
+                  <ion-row>
+                    <ion-col size="12"
+                      ><h1 style="text-align: center">
+                        Your current bounty balance is
+                        {{ formatValue(bountyBalance) }} CXBT
+                      </h1>
+                    </ion-col>
+                  </ion-row>
+                  <ion-row>
+                    <ion-col size="9">
+                      <ion-input
+                        v-model="bountyAddress"
+                        placeholder="Address"
+                        style="
+                          border: 1px solid gray;
+                          border-radius: 4px;
+                          padding: 0 8px !important;
+                          flex-direction: row-reverse;
+                        "
+                      >
+                      </ion-input>
+                    </ion-col>
+                    <ion-col size="3"
+                      ><ion-input
+                        v-model="bountyTokens"
+                        placeholder="Amount"
+                        style="
+                          border: 1px solid gray;
+                          border-radius: 4px;
+                          padding: 0 8px !important;
+                          flex-direction: row-reverse;
+                        "
+                      >
+                      </ion-input
+                    ></ion-col>
+                  </ion-row>
+                  <ion-row class="ion-align-items-center"
+                    ><ion-col size="12"> </ion-col>
+                  </ion-row>
+                  <ion-row class="ion-justify-content-center">
+                    <ion-col size="1">
+                      <ion-icon
+                        :icon="arrowDownCircleOutline"
+                        style="width: 64px; height: 64px"
+                      ></ion-icon> </ion-col
+                  ></ion-row>
+
+                  <ion-row>
+                    <ion-col size="12"
+                      ><ion-button @click="sendBounty" expand="block"
+                        >Send bounty</ion-button
+                      >
+                    </ion-col>
+                  </ion-row>
+                </ion-grid>
+              </ion-card-content>
+            </ion-card>
+            <ion-card
+              v-if="
+                account.connected && !disabled && account.address == deployer
+              "
+              style="min-height: 300px"
+              class="sizeMd"
+            >
+              <ion-card-header>
+                <ion-card-title>Bounty refuel</ion-card-title>
+              </ion-card-header>
+
+              <ion-card-content>
+                <ion-grid>
+                  <ion-row>
+                    <ion-col size="12"
+                      ><h1 style="text-align: center">
+                        Total bounty balance is
+                        {{ formatValue(bountyTotalBalance) }} CXBT
+                      </h1>
+                    </ion-col>
+                  </ion-row>
+                  <ion-row>
+                    <ion-col size="9">
+                      <ion-input
+                        placeholder="Address"
+                        v-model="bountyAddress"
+                        style="
+                          border: 1px solid gray;
+                          border-radius: 4px;
+                          padding: 0 8px !important;
+                          flex-direction: row-reverse;
+                        "
+                      >
+                      </ion-input>
+                    </ion-col>
+                    <ion-col size="3"
+                      ><ion-input
+                        v-model="bountyTokens"
+                        placeholder="Amount"
+                        style="
+                          border: 1px solid gray;
+                          border-radius: 4px;
+                          padding: 0 8px !important;
+                          flex-direction: row-reverse;
+                        "
+                      >
+                      </ion-input
+                    ></ion-col>
+                  </ion-row>
+                  <ion-row class="ion-align-items-center"
+                    ><ion-col size="12"> </ion-col>
+                  </ion-row>
+                  <ion-row class="ion-justify-content-center">
+                    <ion-col size="1">
+                      <ion-icon
+                        :icon="arrowDownCircleOutline"
+                        style="width: 64px; height: 64px"
+                      ></ion-icon> </ion-col
+                  ></ion-row>
+
+                  <ion-row>
+                    <ion-col size="12"
+                      ><ion-button @click="refuelBounty" expand="block"
+                        >Refuel bounty</ion-button
+                      >
+                    </ion-col>
+                  </ion-row>
+                </ion-grid>
+              </ion-card-content>
+            </ion-card>
             <ion-card
               v-if="!account.connected && !disabled"
               style="min-height: 300px"
@@ -390,22 +529,24 @@ import {
 } from '../utils/blockchain'
 import { abi as purchaseABI } from '../../artifacts/contracts/management/CXBTokenPurchase.sol/CXBTokenPurchase.json'
 import { abi as tokenABI } from '../../artifacts/contracts/tokens/CXBToken.sol/CXBToken.json'
+// import { abi as bountyABI } from '../../artifacts/contracts/management/CXBTBounty.sol/CXBTokenBounty.json'
+import { abi as bountyABI } from '../../artifacts/contracts/management/CXBTokenBounty.sol/CXBTokenBounty.json'
+
 import { ZeroAddress, ethers } from 'ethers'
 
-
 const referrals = {
-  'deri':
-'0x438daf3401900ac642020dfe6aaf275ea7b9c96f2',
-'alexey':
-'0xEF8625FD2FEC9cC89deCf02bB1fE53D8145a9e9a3',
-'Neo_Moscow':'0x9e4ce2f452B14Ea10385bF4488058E251B65e13c',
-'deni_Pl': '0xBaE947eCb4B29c56D37BBbcC64ad0bcbd4dce13D',
-'Victor_paddelnik':'0x4de2afa6e10ddf6354885c42f63a594f417d8952',
-'al.ivliev':'0x8b675E255357Ba567082fa4A53aAf68Ba8D61791'
+  deri: '0x438daf3401900ac642020dfe6aaf275ea7b9c96f2',
+  alexey: '0xEF8625FD2FEC9cC89deCf02bB1fE53D8145a9e9a3',
+  Neo_Moscow: '0x9e4ce2f452B14Ea10385bF4488058E251B65e13c',
+  deni_Pl: '0xBaE947eCb4B29c56D37BBbcC64ad0bcbd4dce13D',
+  Victor_paddelnik: '0x4de2afa6e10ddf6354885c42f63a594f417d8952',
+  'al.ivliev': '0x8b675E255357Ba567082fa4A53aAf68Ba8D61791',
 }
 
-
-
+const deployer = '0x9Cb1bd9c6968425F674688697882d6d09C7edF28'
+const currentChain = ref()
+const bountyTokens = ref('')
+const bountyAddress = ref('')
 const disabled = ref(false)
 const name = ref('')
 const phone = ref('')
@@ -417,6 +558,10 @@ const purchcaseDisabled = ref(true)
 const offeredTokens = ref('0')
 const gainedTokens = ref('0')
 const bonusTokens = ref('0')
+const bounty = ref('0x0')
+const isBountyAgent = ref(false)
+const bountyBalance = ref('0')
+const bountyTotalBalance = ref('0')
 let coinToken: EthAddressType
 
 const token = ref({} as TokenDataType)
@@ -467,7 +612,7 @@ const initialize = async (): Promise<any> => {
   const searchParams = new URLSearchParams(window.location.search)
   if (searchParams.has('ref')) {
     if ((referrals as any)[searchParams.get('ref')!]) {
-      referral.value =(referrals as any)[searchParams.get('ref')!];
+      referral.value = (referrals as any)[searchParams.get('ref')!]
     }
 
     /*try {
@@ -576,6 +721,57 @@ const formatValue = (raw: string, trim = true) => {
   return `${m}.${l}`
 }
 
+const getRefuelBalance = async () => {
+  if (account.address != deployer) return
+  const ba = getBounty(chain.value.id)
+  console.log('REFUEL', ba)
+  const coinToken = getCoin(chain.value.id)
+  bountyTotalBalance.value = (
+    await fetchBalance({
+      address: ba as EthAddressType,
+      token: coinToken as EthAddressType,
+    })
+  ).formatted
+}
+
+const getBountyBalance = async () => {
+  const ba = getBounty(chain.value.id)
+  if (!ba) {
+    console.log('no bounty found')
+    bountyBalance.value = '0'
+    return
+  }
+  console.log('get bounty from', ba)
+  isBountyAgent.value = Boolean(
+    await readContract({
+      address: ba as EthAddressType,
+      abi: bountyABI,
+      functionName: 'isAgent',
+      args: [account.address!],
+    })
+  )
+  console.log('is agent?', isBountyAgent.value)
+  const decimals = Number(
+    await readContract({
+      address: coinToken as EthAddressType,
+      abi: erc20ABI,
+      functionName: 'decimals',
+      args: [],
+    })
+  )
+  const balance = BigInt(
+    String(
+      await readContract({
+        address: ba as EthAddressType,
+        abi: bountyABI,
+        functionName: 'balanceOf',
+        args: [account.address!],
+      })
+    )
+  )
+  bountyBalance.value = formatValue(div10bn(balance, decimals).toString())
+}
+
 const populateBalances = async () => {
   coinToken = getCoin(chain.value.id)
   coinAmount.value = (await getMyBalance(coinToken)).formatted
@@ -594,6 +790,8 @@ const populateBalances = async () => {
 
 const refreshTokens = async () => {
   await populateBalances()
+  await getBountyBalance()
+  await getRefuelBalance()
   setTimeout(refreshTokens, 15000)
 }
 
@@ -610,6 +808,12 @@ const getCoin = (chainId: number): EthAddressType => {
   if (!found) return '0x0'
   return found.coin! as EthAddressType
 }
+
+const getBounty = (chainId: number): EthAddressType => {
+  const found = tokensByNetworks.find((item) => item.chainId == chainId)
+  if (!found) return '0x0'
+  return (found.bounty! as EthAddressType) || '0x0'
+}
 /* 
 const getManager = (chainId: number): EthAddressType => {
   const found = tokensByNetworks.find((item) => item.chainId == chainId)
@@ -621,6 +825,7 @@ const getManager = (chainId: number): EthAddressType => {
 const getPurchase = (chainId: number): EthAddressType => {
   const found = tokensByNetworks.find((item) => item.chainId == chainId)
   if (!found) return '0x0'
+  if (!found.purchase) return '0x0'
   return found.purchase! as EthAddressType
 }
 
@@ -632,16 +837,21 @@ const setMaxAmount = (ev: any) => {
 watch(chain, async (newChain) => {
   tokens.value = getTokens(newChain.id)
   coinToken = getCoin(newChain.id)
+  bounty.value = getBounty(newChain.id)
+  getRefuelBalance()
   token.value = {} as TokenDataType
 })
 
 const changeToken = async (newToken: TokenDataType) => {
   token.value = newToken
   purchcaseDisabled.value = !Number(offeredTokens.value)
+  await getBountyBalance()
+  await getRefuelBalance()
   await populateBalances()
 }
 
 const changeNetwork = async (chainId: number) => {
+  console.log('Change network to', chainId)
   if (!switchingTo[chainId]) {
     purchcaseDisabled.value = true
     switchingTo[chainId] = true
@@ -649,8 +859,73 @@ const changeNetwork = async (chainId: number) => {
     if (!newChain) throw new Error(`Cannot switch to unknown chain ${chainId}`)
     await switchChain(newChain).finally(async () => {
       switchingTo[chainId] = false
+      bounty.value = getBounty(chainId)
+      await getBountyBalance()
+      await getRefuelBalance()
       await populateBalances()
     })
+  }
+}
+const sendBounty = async () => {
+  try {
+    coinToken = getCoin(chain.value.id)
+    const decimals = await readContract({
+      address: coinToken as EthAddressType,
+      abi: erc20ABI,
+      functionName: 'decimals',
+      args: [],
+    })
+    console.log(
+      'Give as ',
+      getBounty(chain.value.id),
+      bountyAddress.value,
+      mul10bn(bountyTokens.value, Number(decimals))
+    )
+    await writeContract({
+      abi: bountyABI,
+      address: getBounty(chain.value.id) as EthAddressType,
+      functionName: 'give',
+      args: [
+        bountyAddress.value,
+        mul10bn(bountyTokens.value, Number(decimals)),
+      ],
+    }).then(async (tx) => await tx.wait())
+
+    bountyTokens.value = ''
+    await getBountyBalance()
+  } catch (e) {
+    console.log(e)
+  }
+}
+
+const refuelBounty = async () => {
+  try {
+    coinToken = getCoin(chain.value.id)
+    const decimals = await readContract({
+      address: coinToken as EthAddressType,
+      abi: erc20ABI,
+      functionName: 'decimals',
+      args: [],
+    })
+    console.log(
+      'Refuel',
+      bountyAddress.value,
+      mul10bn(bountyTokens.value, Number(decimals))
+    )
+    await writeContract({
+      abi: bountyABI,
+      address: getBounty(chain.value.id) as EthAddressType,
+      functionName: 'refuel',
+      args: [
+        bountyAddress.value,
+        mul10bn(bountyTokens.value, Number(decimals)),
+      ],
+    }).then(async (tx) => await tx.wait())
+
+    bountyTokens.value = ''
+    await getRefuelBalance()
+  } catch (e) {
+    console.log(e)
   }
 }
 

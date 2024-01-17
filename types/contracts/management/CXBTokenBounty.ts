@@ -23,37 +23,42 @@ import type {
   TypedContractMethod,
 } from "../../common";
 
-export interface CXBTokenAirdropInterface extends Interface {
+export interface CXBTokenBountyInterface extends Interface {
   getFunction(
     nameOrSignature:
       | "authority"
-      | "cancelAirDrop"
+      | "balanceOf"
+      | "clean"
+      | "empty"
+      | "give"
+      | "isAgent"
       | "isConsumingScheduledOp"
       | "pause"
       | "paused"
-      | "redeem"
-      | "redeemAmount"
-      | "root"
+      | "refuel"
       | "setAuthority"
+      | "setVesting"
       | "unpause"
-      | "updateMerkleRoot"
-      | "updateRedeemAmount"
-      | "updateToken"
-      | "updateVesting"
+      | "vesting"
   ): FunctionFragment;
 
   getEvent(
-    nameOrSignatureOrTopic:
-      | "AuthorityUpdated"
-      | "Paused"
-      | "Redeem"
-      | "Unpaused"
-      | "Vesting"
+    nameOrSignatureOrTopic: "AuthorityUpdated" | "Paused" | "Unpaused"
   ): EventFragment;
 
   encodeFunctionData(functionFragment: "authority", values?: undefined): string;
   encodeFunctionData(
-    functionFragment: "cancelAirDrop",
+    functionFragment: "balanceOf",
+    values: [AddressLike]
+  ): string;
+  encodeFunctionData(functionFragment: "clean", values: [AddressLike]): string;
+  encodeFunctionData(functionFragment: "empty", values: [AddressLike]): string;
+  encodeFunctionData(
+    functionFragment: "give",
+    values: [AddressLike, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "isAgent",
     values: [AddressLike]
   ): string;
   encodeFunctionData(
@@ -62,72 +67,41 @@ export interface CXBTokenAirdropInterface extends Interface {
   ): string;
   encodeFunctionData(functionFragment: "pause", values?: undefined): string;
   encodeFunctionData(functionFragment: "paused", values?: undefined): string;
-  encodeFunctionData(functionFragment: "redeem", values: [BytesLike[]]): string;
   encodeFunctionData(
-    functionFragment: "redeemAmount",
-    values?: undefined
+    functionFragment: "refuel",
+    values: [AddressLike, BigNumberish]
   ): string;
-  encodeFunctionData(functionFragment: "root", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "setAuthority",
     values: [AddressLike]
   ): string;
+  encodeFunctionData(
+    functionFragment: "setVesting",
+    values: [AddressLike]
+  ): string;
   encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
-  encodeFunctionData(
-    functionFragment: "updateMerkleRoot",
-    values: [BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "updateRedeemAmount",
-    values: [BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "updateToken",
-    values: [AddressLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "updateVesting",
-    values: [AddressLike]
-  ): string;
+  encodeFunctionData(functionFragment: "vesting", values?: undefined): string;
 
   decodeFunctionResult(functionFragment: "authority", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "cancelAirDrop",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "clean", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "empty", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "give", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "isAgent", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "isConsumingScheduledOp",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "pause", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "redeem", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "redeemAmount",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "root", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "refuel", data: BytesLike): Result;
   decodeFunctionResult(
     functionFragment: "setAuthority",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "setVesting", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "unpause", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "updateMerkleRoot",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "updateRedeemAmount",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "updateToken",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "updateVesting",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: "vesting", data: BytesLike): Result;
 }
 
 export namespace AuthorityUpdatedEvent {
@@ -154,19 +128,6 @@ export namespace PausedEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
-export namespace RedeemEvent {
-  export type InputTuple = [account: AddressLike, amount: BigNumberish];
-  export type OutputTuple = [account: string, amount: bigint];
-  export interface OutputObject {
-    account: string;
-    amount: bigint;
-  }
-  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
-  export type Filter = TypedDeferredTopicFilter<Event>;
-  export type Log = TypedEventLog<Event>;
-  export type LogDescription = TypedLogDescription<Event>;
-}
-
 export namespace UnpausedEvent {
   export type InputTuple = [account: AddressLike];
   export type OutputTuple = [account: string];
@@ -179,24 +140,11 @@ export namespace UnpausedEvent {
   export type LogDescription = TypedLogDescription<Event>;
 }
 
-export namespace VestingEvent {
-  export type InputTuple = [account: AddressLike, amount: BigNumberish];
-  export type OutputTuple = [account: string, amount: bigint];
-  export interface OutputObject {
-    account: string;
-    amount: bigint;
-  }
-  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
-  export type Filter = TypedDeferredTopicFilter<Event>;
-  export type Log = TypedEventLog<Event>;
-  export type LogDescription = TypedLogDescription<Event>;
-}
-
-export interface CXBTokenAirdrop extends BaseContract {
-  connect(runner?: ContractRunner | null): CXBTokenAirdrop;
+export interface CXBTokenBounty extends BaseContract {
+  connect(runner?: ContractRunner | null): CXBTokenBounty;
   waitForDeployment(): Promise<this>;
 
-  interface: CXBTokenAirdropInterface;
+  interface: CXBTokenBountyInterface;
 
   queryFilter<TCEvent extends TypedContractEvent>(
     event: TCEvent,
@@ -237,7 +185,19 @@ export interface CXBTokenAirdrop extends BaseContract {
 
   authority: TypedContractMethod<[], [string], "view">;
 
-  cancelAirDrop: TypedContractMethod<[_to: AddressLike], [void], "nonpayable">;
+  balanceOf: TypedContractMethod<[target: AddressLike], [bigint], "view">;
+
+  clean: TypedContractMethod<[_to: AddressLike], [void], "nonpayable">;
+
+  empty: TypedContractMethod<[target: AddressLike], [void], "nonpayable">;
+
+  give: TypedContractMethod<
+    [target: AddressLike, amount: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+
+  isAgent: TypedContractMethod<[target: AddressLike], [boolean], "view">;
 
   isConsumingScheduledOp: TypedContractMethod<[], [string], "view">;
 
@@ -245,11 +205,11 @@ export interface CXBTokenAirdrop extends BaseContract {
 
   paused: TypedContractMethod<[], [boolean], "view">;
 
-  redeem: TypedContractMethod<[proof: BytesLike[]], [void], "nonpayable">;
-
-  redeemAmount: TypedContractMethod<[], [bigint], "view">;
-
-  root: TypedContractMethod<[], [string], "view">;
+  refuel: TypedContractMethod<
+    [agent: AddressLike, addAmount: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
 
   setAuthority: TypedContractMethod<
     [newAuthority: AddressLike],
@@ -257,27 +217,15 @@ export interface CXBTokenAirdrop extends BaseContract {
     "nonpayable"
   >;
 
-  unpause: TypedContractMethod<[], [void], "nonpayable">;
-
-  updateMerkleRoot: TypedContractMethod<
-    [_root: BytesLike],
-    [void],
-    "nonpayable"
-  >;
-
-  updateRedeemAmount: TypedContractMethod<
-    [_amount: BigNumberish],
-    [void],
-    "nonpayable"
-  >;
-
-  updateToken: TypedContractMethod<[_token: AddressLike], [void], "nonpayable">;
-
-  updateVesting: TypedContractMethod<
+  setVesting: TypedContractMethod<
     [_vesting: AddressLike],
     [void],
     "nonpayable"
   >;
+
+  unpause: TypedContractMethod<[], [void], "nonpayable">;
+
+  vesting: TypedContractMethod<[], [string], "view">;
 
   getFunction<T extends ContractMethod = ContractMethod>(
     key: string | FunctionFragment
@@ -287,8 +235,24 @@ export interface CXBTokenAirdrop extends BaseContract {
     nameOrSignature: "authority"
   ): TypedContractMethod<[], [string], "view">;
   getFunction(
-    nameOrSignature: "cancelAirDrop"
+    nameOrSignature: "balanceOf"
+  ): TypedContractMethod<[target: AddressLike], [bigint], "view">;
+  getFunction(
+    nameOrSignature: "clean"
   ): TypedContractMethod<[_to: AddressLike], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "empty"
+  ): TypedContractMethod<[target: AddressLike], [void], "nonpayable">;
+  getFunction(
+    nameOrSignature: "give"
+  ): TypedContractMethod<
+    [target: AddressLike, amount: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
+  getFunction(
+    nameOrSignature: "isAgent"
+  ): TypedContractMethod<[target: AddressLike], [boolean], "view">;
   getFunction(
     nameOrSignature: "isConsumingScheduledOp"
   ): TypedContractMethod<[], [string], "view">;
@@ -299,32 +263,24 @@ export interface CXBTokenAirdrop extends BaseContract {
     nameOrSignature: "paused"
   ): TypedContractMethod<[], [boolean], "view">;
   getFunction(
-    nameOrSignature: "redeem"
-  ): TypedContractMethod<[proof: BytesLike[]], [void], "nonpayable">;
-  getFunction(
-    nameOrSignature: "redeemAmount"
-  ): TypedContractMethod<[], [bigint], "view">;
-  getFunction(
-    nameOrSignature: "root"
-  ): TypedContractMethod<[], [string], "view">;
+    nameOrSignature: "refuel"
+  ): TypedContractMethod<
+    [agent: AddressLike, addAmount: BigNumberish],
+    [void],
+    "nonpayable"
+  >;
   getFunction(
     nameOrSignature: "setAuthority"
   ): TypedContractMethod<[newAuthority: AddressLike], [void], "nonpayable">;
   getFunction(
+    nameOrSignature: "setVesting"
+  ): TypedContractMethod<[_vesting: AddressLike], [void], "nonpayable">;
+  getFunction(
     nameOrSignature: "unpause"
   ): TypedContractMethod<[], [void], "nonpayable">;
   getFunction(
-    nameOrSignature: "updateMerkleRoot"
-  ): TypedContractMethod<[_root: BytesLike], [void], "nonpayable">;
-  getFunction(
-    nameOrSignature: "updateRedeemAmount"
-  ): TypedContractMethod<[_amount: BigNumberish], [void], "nonpayable">;
-  getFunction(
-    nameOrSignature: "updateToken"
-  ): TypedContractMethod<[_token: AddressLike], [void], "nonpayable">;
-  getFunction(
-    nameOrSignature: "updateVesting"
-  ): TypedContractMethod<[_vesting: AddressLike], [void], "nonpayable">;
+    nameOrSignature: "vesting"
+  ): TypedContractMethod<[], [string], "view">;
 
   getEvent(
     key: "AuthorityUpdated"
@@ -341,25 +297,11 @@ export interface CXBTokenAirdrop extends BaseContract {
     PausedEvent.OutputObject
   >;
   getEvent(
-    key: "Redeem"
-  ): TypedContractEvent<
-    RedeemEvent.InputTuple,
-    RedeemEvent.OutputTuple,
-    RedeemEvent.OutputObject
-  >;
-  getEvent(
     key: "Unpaused"
   ): TypedContractEvent<
     UnpausedEvent.InputTuple,
     UnpausedEvent.OutputTuple,
     UnpausedEvent.OutputObject
-  >;
-  getEvent(
-    key: "Vesting"
-  ): TypedContractEvent<
-    VestingEvent.InputTuple,
-    VestingEvent.OutputTuple,
-    VestingEvent.OutputObject
   >;
 
   filters: {
@@ -385,17 +327,6 @@ export interface CXBTokenAirdrop extends BaseContract {
       PausedEvent.OutputObject
     >;
 
-    "Redeem(address,uint256)": TypedContractEvent<
-      RedeemEvent.InputTuple,
-      RedeemEvent.OutputTuple,
-      RedeemEvent.OutputObject
-    >;
-    Redeem: TypedContractEvent<
-      RedeemEvent.InputTuple,
-      RedeemEvent.OutputTuple,
-      RedeemEvent.OutputObject
-    >;
-
     "Unpaused(address)": TypedContractEvent<
       UnpausedEvent.InputTuple,
       UnpausedEvent.OutputTuple,
@@ -405,17 +336,6 @@ export interface CXBTokenAirdrop extends BaseContract {
       UnpausedEvent.InputTuple,
       UnpausedEvent.OutputTuple,
       UnpausedEvent.OutputObject
-    >;
-
-    "Vesting(address,uint256)": TypedContractEvent<
-      VestingEvent.InputTuple,
-      VestingEvent.OutputTuple,
-      VestingEvent.OutputObject
-    >;
-    Vesting: TypedContractEvent<
-      VestingEvent.InputTuple,
-      VestingEvent.OutputTuple,
-      VestingEvent.OutputObject
     >;
   };
 }

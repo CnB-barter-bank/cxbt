@@ -2,6 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export { CXBTokenAirdrop__factory } from "./CXBTokenAirdrop__factory";
+export { CXBTokenBounty__factory } from "./CXBTokenBounty__factory";
 export { CXBTokenPurchase__factory } from "./CXBTokenPurchase__factory";
 export { CXBTokenVesting__factory } from "./CXBTokenVesting__factory";
 export { PresaleManager__factory } from "./PresaleManager__factory";

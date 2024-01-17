@@ -2,6 +2,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export type { CXBTokenAirdrop } from "./CXBTokenAirdrop";
+export type { CXBTokenBounty } from "./CXBTokenBounty";
 export type { CXBTokenPurchase } from "./CXBTokenPurchase";
 export type { CXBTokenVesting } from "./CXBTokenVesting";
 export type { PresaleManager } from "./PresaleManager";

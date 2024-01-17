@@ -2,7 +2,9 @@
 /* tslint:disable */
 /* eslint-disable */
 export type { Airdrop } from "./Airdrop";
+export type { Bounty } from "./Bounty";
 export type { IAirdrop } from "./IAirdrop";
+export type { IBounty } from "./IBounty";
 export type { IPurchase } from "./IPurchase";
 export type { IVesting } from "./IVesting";
 export type { Purchase } from "./Purchase";
