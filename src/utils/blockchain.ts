@@ -567,3 +567,15 @@ export const mul10bn = (amount: string | number, decimals: number): bigint => {
   if (!l) return BigInt(m + '0'.repeat(Number(decimals)))
   return BigInt(m + l + '0'.repeat(Number(decimals) - l.length))
 }
+
+export const referrals = {
+  deri: '0x438daf3401900ac642020dfe6aaf275ea7b9c96f2',
+  alexey: '0xEF8625FD2FEC9cC89deCf02bB1fE53D8145a9e9a3',
+  Neo_Moscow: '0x9e4ce2f452B14Ea10385bF4488058E251B65e13c',
+  deni_Pl: '0xBaE947eCb4B29c56D37BBbcC64ad0bcbd4dce13D',
+  Victor_paddelnik: '0x4de2afa6e10ddf6354885c42f63a594f417d8952',
+  'al.ivliev': '0x8b675E255357Ba567082fa4A53aAf68Ba8D61791',
+  Frank: '0x76225692c20EBf2Fe8eD7CB1a7Fe453DEB97347E'
+}
+
+export const deployer = '0x9Cb1bd9c6968425F674688697882d6d09C7edF28'

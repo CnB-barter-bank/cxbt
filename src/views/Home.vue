@@ -256,6 +256,7 @@
             >
               <ion-card-header>
                 <ion-card-title>Bounty refuel</ion-card-title>
+                <ion-card-subtitle>{{ getBounty(chain.id) }}</ion-card-subtitle>
               </ion-card-header>
 
               <ion-card-content>
@@ -526,6 +527,8 @@ import {
   chainLinkABI,
   div10bn,
   mul10bn,
+  referrals,
+  deployer
 } from '../utils/blockchain'
 import { abi as purchaseABI } from '../../artifacts/contracts/management/CXBTokenPurchase.sol/CXBTokenPurchase.json'
 import { abi as tokenABI } from '../../artifacts/contracts/tokens/CXBToken.sol/CXBToken.json'
@@ -534,16 +537,6 @@ import { abi as bountyABI } from '../../artifacts/contracts/management/CXBTokenB
 
 import { ZeroAddress, ethers } from 'ethers'
 
-const referrals = {
-  deri: '0x438daf3401900ac642020dfe6aaf275ea7b9c96f2',
-  alexey: '0xEF8625FD2FEC9cC89deCf02bB1fE53D8145a9e9a3',
-  Neo_Moscow: '0x9e4ce2f452B14Ea10385bF4488058E251B65e13c',
-  deni_Pl: '0xBaE947eCb4B29c56D37BBbcC64ad0bcbd4dce13D',
-  Victor_paddelnik: '0x4de2afa6e10ddf6354885c42f63a594f417d8952',
-  'al.ivliev': '0x8b675E255357Ba567082fa4A53aAf68Ba8D61791',
-}
-
-const deployer = '0x9Cb1bd9c6968425F674688697882d6d09C7edF28'
 const bountyTokens = ref('')
 const bountyAddress = ref('')
 const disabled = ref(false)
@@ -723,7 +716,6 @@ const formatValue = (raw: string, trim = true) => {
 const getRefuelBalance = async () => {
   if (account.address != deployer) return
   const ba = getBounty(chain.value.id)
-  console.log('REFUEL', ba)
   const coinToken = getCoin(chain.value.id)
   bountyTotalBalance.value = (
     await fetchBalance({
@@ -736,11 +728,9 @@ const getRefuelBalance = async () => {
 const getBountyBalance = async () => {
   const ba = getBounty(chain.value.id)
   if (!ba) {
-    console.log('no bounty found')
     bountyBalance.value = '0'
     return
   }
-  console.log('get bounty from', ba)
   isBountyAgent.value = Boolean(
     await readContract({
       address: ba as EthAddressType,
@@ -749,7 +739,6 @@ const getBountyBalance = async () => {
       args: [account.address!],
     })
   )
-  console.log('is agent?', isBountyAgent.value)
   const decimals = Number(
     await readContract({
       address: coinToken as EthAddressType,
@@ -850,7 +839,6 @@ const changeToken = async (newToken: TokenDataType) => {
 }
 
 const changeNetwork = async (chainId: number) => {
-  console.log('Change network to', chainId)
   if (!switchingTo[chainId]) {
     purchcaseDisabled.value = true
     switchingTo[chainId] = true
@@ -873,13 +861,7 @@ const sendBounty = async () => {
       abi: erc20ABI,
       functionName: 'decimals',
       args: [],
-    })
-    console.log(
-      'Give as ',
-      getBounty(chain.value.id),
-      bountyAddress.value,
-      mul10bn(bountyTokens.value, Number(decimals))
-    )
+    }) 
     await writeContract({
       abi: bountyABI,
       address: getBounty(chain.value.id) as EthAddressType,
@@ -906,11 +888,6 @@ const refuelBounty = async () => {
       functionName: 'decimals',
       args: [],
     })
-    console.log(
-      'Refuel',
-      bountyAddress.value,
-      mul10bn(bountyTokens.value, Number(decimals))
-    )
     await writeContract({
       abi: bountyABI,
       address: getBounty(chain.value.id) as EthAddressType,
