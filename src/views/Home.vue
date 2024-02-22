@@ -309,9 +309,17 @@
                   ></ion-row>
 
                   <ion-row>
-                    <ion-col size="12"
+                    <ion-col size="6"
                       ><ion-button @click="refuelBounty" expand="block"
                         >Refuel bounty</ion-button
+                      >
+                    </ion-col>
+                    <ion-col size="6"
+                      ><ion-button
+                        @click="emptyBounty"
+                        expand="block"
+                        color="danger"
+                        >Empty bounty</ion-button
                       >
                     </ion-col>
                   </ion-row>
@@ -394,64 +402,7 @@
               </ion-card-content>
             </ion-card>
 
-            <ion-card v-if="!disabled" style="min-height: 300px">
-              <ion-card-header>
-                <ion-card-title>Contact us</ion-card-title>
-              </ion-card-header>
-              <ion-card-content style="min-height: 200px; padding-top: 90px">
-                <p>
-                  You can contact us using the following details:<br />
-                  Email:
-                  <a href="mailto:support@clearingandbarterhouse.eu"
-                    >support@clearingandbarterhouse.eu</a
-                  ><br />
-                  Telegram:
-                  <a href="https://t.me/ClearingAndBarterHouse" target="_blank"
-                    >@ClearingAndBarterHouse</a
-                  ><br />
-                  Or fill this form to receive a free call
-                </p>
-
-                <ion-list :inset="true">
-                  <ion-item>
-                    <ion-input
-                      v-model="name"
-                      label="Your name"
-                      placeholder="Enter your name"
-                    ></ion-input>
-                  </ion-item>
-
-                  <ion-item>
-                    <ion-input
-                      v-model="phone"
-                      label="Phone or nickname"
-                      placeholder="Enter your phone or nickname"
-                    ></ion-input>
-                  </ion-item>
-                  <ion-item lines="none">
-                    <ion-segment v-model="service">
-                      <ion-segment-button value="call">
-                        <ion-label>Direct call</ion-label>
-                      </ion-segment-button>
-                      <ion-segment-button value="whatsapp">
-                        <ion-label>Whatsapp</ion-label>
-                      </ion-segment-button>
-                      <ion-segment-button value="viber">
-                        <ion-label>Viber</ion-label>
-                      </ion-segment-button>
-                      <ion-segment-button value="telegram">
-                        <ion-label>Telegram</ion-label>
-                      </ion-segment-button>
-                    </ion-segment></ion-item
-                  >
-                  <ion-item lines="none">
-                    <ion-button @click="contactMe" expand="block" size="default"
-                      >Request a free call</ion-button
-                    >
-                  </ion-item>
-                </ion-list>
-              </ion-card-content>
-            </ion-card>
+            <Contact v-if="!disabled"  />
           </ion-col>
         </ion-row>
       </ion-grid>
@@ -528,7 +479,7 @@ import {
   div10bn,
   mul10bn,
   referrals,
-  deployer
+  deployer,
 } from '../utils/blockchain'
 import { abi as purchaseABI } from '../../artifacts/contracts/management/CXBTokenPurchase.sol/CXBTokenPurchase.json'
 import { abi as tokenABI } from '../../artifacts/contracts/tokens/CXBToken.sol/CXBToken.json'
@@ -536,6 +487,8 @@ import { abi as tokenABI } from '../../artifacts/contracts/tokens/CXBToken.sol/C
 import { abi as bountyABI } from '../../artifacts/contracts/management/CXBTokenBounty.sol/CXBTokenBounty.json'
 
 import { ZeroAddress, ethers } from 'ethers'
+
+import Contact from '../components/Contact.vue'
 
 const bountyTokens = ref('')
 const bountyAddress = ref('')
@@ -861,7 +814,7 @@ const sendBounty = async () => {
       abi: erc20ABI,
       functionName: 'decimals',
       args: [],
-    }) 
+    })
     await writeContract({
       abi: bountyABI,
       address: getBounty(chain.value.id) as EthAddressType,
@@ -878,7 +831,20 @@ const sendBounty = async () => {
     console.log(e)
   }
 }
-
+const emptyBounty = async () => {
+  try {
+    coinToken = getCoin(chain.value.id)
+    await writeContract({
+      abi: bountyABI,
+      address: getBounty(chain.value.id) as EthAddressType,
+      functionName: 'empty',
+      args: [bountyAddress.value],
+    }).then(async (tx) => await tx.wait())
+    await getRefuelBalance()
+  } catch (e) {
+    console.log(e)
+  }
+}
 const refuelBounty = async () => {
   try {
     coinToken = getCoin(chain.value.id)

@@ -3,8 +3,10 @@
 /* eslint-disable */
 export type { Airdrop } from "./Airdrop";
 export type { Bounty } from "./Bounty";
+export type { ColdStorage } from "./ColdStorage";
 export type { IAirdrop } from "./IAirdrop";
 export type { IBounty } from "./IBounty";
+export type { IColdStorage } from "./IColdStorage";
 export type { IPurchase } from "./IPurchase";
 export type { IVesting } from "./IVesting";
 export type { Purchase } from "./Purchase";

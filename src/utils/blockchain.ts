@@ -576,7 +576,8 @@ export const referrals = {
   Victor_paddelnik: '0x4de2afa6e10ddf6354885c42f63a594f417d8952',
   'al.ivliev': '0x8b675E255357Ba567082fa4A53aAf68Ba8D61791',
   Frank: '0x76225692c20EBf2Fe8eD7CB1a7Fe453DEB97347E',
-  Missuniverse: '0x775100228a2e38025e4614B57988363e493adcd6'
+  Missuniverse: '0x775100228a2e38025e4614B57988363e493adcd6',
+  Clevon: '0x926cd12C7c9b030795AEcf25D12976d609279635'
 }
 
 export const deployer = '0x9Cb1bd9c6968425F674688697882d6d09C7edF28'

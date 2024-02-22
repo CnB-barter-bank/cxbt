@@ -22,6 +22,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.Bounty__factory>;
     getContractFactory(
+      name: "ColdStorage",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.ColdStorage__factory>;
+    getContractFactory(
       name: "IAirdrop",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IAirdrop__factory>;
@@ -29,6 +33,10 @@ declare module "hardhat/types/runtime" {
       name: "IBounty",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IBounty__factory>;
+    getContractFactory(
+      name: "IColdStorage",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.IColdStorage__factory>;
     getContractFactory(
       name: "IPurchase",
       signerOrOptions?: ethers.Signer | FactoryOptions
@@ -190,6 +198,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.EnumerableMap__factory>;
     getContractFactory(
+      name: "CXBTColdStorage",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.CXBTColdStorage__factory>;
+    getContractFactory(
       name: "CXBTokenAirdrop",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.CXBTokenAirdrop__factory>;
@@ -233,6 +245,11 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.Bounty>;
     getContractAt(
+      name: "ColdStorage",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.ColdStorage>;
+    getContractAt(
       name: "IAirdrop",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
@@ -242,6 +259,11 @@ declare module "hardhat/types/runtime" {
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.IBounty>;
+    getContractAt(
+      name: "IColdStorage",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.IColdStorage>;
     getContractAt(
       name: "IPurchase",
       address: string | ethers.Addressable,
@@ -442,6 +464,11 @@ declare module "hardhat/types/runtime" {
       address: string | ethers.Addressable,
       signer?: ethers.Signer
     ): Promise<Contracts.EnumerableMap>;
+    getContractAt(
+      name: "CXBTColdStorage",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.CXBTColdStorage>;
     getContractAt(
       name: "CXBTokenAirdrop",
       address: string | ethers.Addressable,
@@ -492,6 +519,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.Bounty>;
     deployContract(
+      name: "ColdStorage",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.ColdStorage>;
+    deployContract(
       name: "IAirdrop",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IAirdrop>;
@@ -499,6 +530,10 @@ declare module "hardhat/types/runtime" {
       name: "IBounty",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IBounty>;
+    deployContract(
+      name: "IColdStorage",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IColdStorage>;
     deployContract(
       name: "IPurchase",
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -659,6 +694,10 @@ declare module "hardhat/types/runtime" {
       name: "EnumerableMap",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.EnumerableMap>;
+    deployContract(
+      name: "CXBTColdStorage",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.CXBTColdStorage>;
     deployContract(
       name: "CXBTokenAirdrop",
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -703,6 +742,11 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.Bounty>;
     deployContract(
+      name: "ColdStorage",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.ColdStorage>;
+    deployContract(
       name: "IAirdrop",
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
@@ -712,6 +756,11 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.IBounty>;
+    deployContract(
+      name: "IColdStorage",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.IColdStorage>;
     deployContract(
       name: "IPurchase",
       args: any[],
@@ -912,6 +961,11 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.EnumerableMap>;
+    deployContract(
+      name: "CXBTColdStorage",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.CXBTColdStorage>;
     deployContract(
       name: "CXBTokenAirdrop",
       args: any[],
